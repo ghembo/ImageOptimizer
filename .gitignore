@@ -1,0 +1,48 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Backup files
+*.bak
+
+# Others
+*.suo
+*.sdf
+*.opensdf
+*.user
+*.opendb
+*.db
+
+# Dirs
+**/.metadata/
+**/.dm/
+**/obj/
+**/bin/
+**/Debug/
+**/Release/
+**/LogFiles/
+**/Reports/
+**/Unused/
+**/Packages/
