@@ -3,6 +3,7 @@
 #include "opencv2\core\core.hpp"
 
 #include <algorithm>
+#include <tuple>
 #include <vector>
 #include <memory>
 
@@ -10,7 +11,7 @@ namespace ImageSimilarity
 {
 	#define SQUARE_LEN 8
 
-	void convolve(float *img, int width, int height, float *result, int *rw, int *rh)
+	std::pair<int, int> convolve(float *img, int width, int height, float *result)
 	{
 		int dst_w = width - SQUARE_LEN + 1;
 		int dst_h = height - SQUARE_LEN + 1;
@@ -59,50 +60,48 @@ namespace ImageSimilarity
 
 		delete[] boxes;
 
-		if (rw) *rw = dst_w;
-		if (rh) *rh = dst_h;
+		return{ dst_w , dst_h };
 	}
 
-	void decimate(float *img, int width, int height, int factor, float *result, int *rw, int *rh)
+	std::pair<int, int> decimate(float *image, int width, int height, int scaling)
 	{
-		int sw = width / factor;
-		int effective_width = sw * factor;
-		int sh = height / factor;
-		int effective_height = sh * factor;
-		float* dst = result ? result : img;
+		int scaledWidth = width / scaling;
+		int effectiveWidth = scaledWidth * scaling;
+		int scaledHeight = height / scaling;
+		int effectiveHeight = scaledHeight * scaling;
+		float* destination = image;
 
-		float normalization = 1.0f / (factor * factor);
+		float normalization = 1.0f / (scaling * scaling);
 
-		for (int y = 0; y < effective_height; y += factor)
-		{			
-			for (int x = 0; x < effective_width; x += factor)
+		for (int y = 0; y < effectiveHeight; y += scaling)
+		{
+			for (int x = 0; x < effectiveWidth; x += scaling)
 			{
 				float sum = 0.0f;
-				for (int row = 0; row < factor; row++) // unroll agambini
+				for (int row = 0; row < scaling; row++) // unroll agambini
 				{
-					float* curr_img = img + (y + row) * width + x;
-					for (int col = 0; col < factor; col++)
+					float* curr_img = image + (y + row) * width + x;
+					for (int col = 0; col < scaling; col++)
 					{
 						sum += *curr_img++;
 					}
 				}
 
-				*dst++ = sum * normalization;
+				*destination++ = sum * normalization;
 			}
 		}
 
-		if (rw) *rw = sw;
-		if (rh) *rh = sh;
+		return { scaledWidth , scaledHeight };
 	}
 
-	float _ssim(float *ref, float *cmp, int width, int height)
+	float ssim(float *ref, float *cmp, int width, int height)
 	{
-		const int L = 255;
-		const double K1 = 0.01;
-		const double K2 = 0.03;
+		constexpr int L = 255;
+		constexpr double K1 = 0.01;
+		constexpr double K2 = 0.03;
 
-		const double C1 = (K1*L) * (K1*L);
-		const double C2 = (K2*L) * (K2*L);
+		constexpr double C1 = (K1*L) * (K1*L);
+		constexpr double C2 = (K2*L) * (K2*L);
 
 		float* ref_mu = new float[width*height];
 		float* cmp_mu = new float[width*height];
@@ -111,8 +110,8 @@ namespace ImageSimilarity
 		float* sigma_both = new float[width*height];
 
 		/* Calculate mean */
-		convolve(ref, width, height, ref_mu, 0, 0);
-		convolve(cmp, width, height, cmp_mu, 0, 0);
+		convolve(ref, width, height, ref_mu);
+		convolve(cmp, width, height, cmp_mu);
 		
 		for (int offset = 0; offset < width * height; offset++)
 		{
@@ -122,9 +121,9 @@ namespace ImageSimilarity
 		}
 
 		/* Calculate sigma */
-		convolve(ref_sigma_sqd, width, height, 0, 0, 0);
-		convolve(cmp_sigma_sqd, width, height, 0, 0, 0);
-		convolve(sigma_both, width, height, 0, &width, &height); /* Update the width and height */
+		convolve(ref_sigma_sqd, width, height, 0);
+		convolve(cmp_sigma_sqd, width, height, 0);
+		std::tie(width, height) = convolve(sigma_both, width, height, 0);
 
 		double ssim_sum = 0.0;
 		float norm = 1.0f / (SQUARE_LEN * SQUARE_LEN);
@@ -158,8 +157,13 @@ namespace ImageSimilarity
 		return (float)(ssim_sum / (double)(width*height));
 	}
 
+	int computeScale(int width, int height)
+	{
+		return std::max(1, (int)(std::min(width, height) / 256.0f + 0.5f)); // TODO
+	}
+
 	// TODO usare int
-	float ssim(const cv::Mat& referenceImage, const cv::Mat& compareImage)
+	float ComputeSsim(const cv::Mat& referenceImage, const cv::Mat& compareImage)
 	{
 		if (!referenceImage.isContinuous() || !compareImage.isContinuous())
 		{
@@ -173,9 +177,6 @@ namespace ImageSimilarity
 
 		int width = referenceImage.cols;
 		int height = referenceImage.rows;
-
-		/* Initialize algorithm parameters */
-		int scale = std::max( 1, (int)( std::min(width, height) / 256.0f + 0.5f) ); // TODO
 
 		uchar* reference = referenceImage.data;
 		uchar* compare = compareImage.data;
@@ -200,15 +201,16 @@ namespace ImageSimilarity
 			cmp_f[i] = static_cast<float>(compare[i]);
 		}
 
+		int scale = computeScale(width, height);
+
 		/* Scale the images down if required */
 		if (scale > 1)
 		{
-			/* Resample */
-			decimate(ref_f, width, height, scale, 0, 0, 0);
-			decimate(cmp_f, width, height, scale, 0, &width, &height); // Update width/height
+			decimate(ref_f, width, height, scale);
+			std::tie(width, height) = decimate(cmp_f, width, height, scale);
 		}
 		
-		float result = _ssim(ref_f, cmp_f, width, height);
+		float result = ssim(ref_f, cmp_f, width, height);
 
 		delete[] ref_f;
 		delete[] cmp_f;

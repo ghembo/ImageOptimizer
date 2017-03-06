@@ -85,7 +85,7 @@ void ImageProcessorImplementation::optimizeImage(const cv::Mat& referenceImage)
 		assert(compressedImage.data != NULL);
 		assert(compressedImage.isContinuous());
 
-		float ssim = ImageSimilarity::ssim(referenceImage, compressedImage);
+		float ssim = ImageSimilarity::ComputeSsim(referenceImage, compressedImage);
 
 		qualities.push_back(std::make_pair(currentQuality, ssim));
 
