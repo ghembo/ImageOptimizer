@@ -92,19 +92,6 @@ void Logger::Initialize()
 void Logger::EnableFileLogging(SeverityLevel minimumSeverity, const std::string& component)
 {
 	DisableFileLogging();
-
-	boost::shared_ptr<core> core = core::get();
-
-	if (component.empty())
-	{
-		core->set_filter( severity >= minimumSeverity );
-	}
-	else
-	{
-		core->set_filter(
-			severity >= minimumSeverity &&
-			expressions::attr< std::string >("Channel") == component );
-	}
 	
 	const char* logPattern = "ImageProcessorLog_%3N.txt";
 
@@ -123,7 +110,18 @@ void Logger::EnableFileLogging(SeverityLevel minimumSeverity, const std::string&
 
 	s_textFileSink->set_formatter(FORMAT);
 
-	core->add_sink(s_textFileSink);
+	if (component.empty())
+	{
+		s_textFileSink->set_filter(severity >= minimumSeverity);
+	}
+	else
+	{
+		s_textFileSink->set_filter(
+			severity >= minimumSeverity &&
+			expressions::attr< std::string >("Channel") == component);
+	}
+	
+	core::get()->add_sink(s_textFileSink);
 }
 
 void Logger::DisableFileLogging()
