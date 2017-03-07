@@ -2,6 +2,7 @@
 
 #include "Logger.h"
 #include "ImageSimilarity.h"
+#include "JpegEncoderDecoder.h"
 
 #include "opencv2\opencv.hpp"
 #include "opencv2\core\core.hpp"
@@ -99,9 +100,9 @@ std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::comput
 
 	for (int i = 0; i < maxNumberOfIterations; i++)
 	{
-		std::vector<uchar> buffer = memoryEncodeJpeg(referenceImage, currentQuality);
+		std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(referenceImage, currentQuality);
 
-		auto compressedImage = memoryDecodeGrayscaleJpeg(buffer);
+		auto compressedImage = JpegEncoderDecoder::MemoryDecodeGrayscaleJpeg(buffer);
 
 		assert(compressedImage.data != NULL);
 		assert(compressedImage.isContinuous());
@@ -130,24 +131,6 @@ std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::comput
 	}
 
 	return qualities;
-}
-
-std::vector<uchar> ImageProcessorImplementation::memoryEncodeJpeg(const cv::Mat& image, unsigned int quality)
-{
-	std::vector<int> parameters;
-	parameters.push_back(CV_IMWRITE_JPEG_QUALITY);
-	parameters.push_back(quality);
-
-	std::vector<uchar> buffer;
-
-	cv::imencode(".jpg", image, buffer, parameters);
-
-	return buffer;
-}
-
-cv::Mat ImageProcessorImplementation::memoryDecodeGrayscaleJpeg(const std::vector<uchar>& buffer)
-{
-	return cv::imdecode(buffer, CV_LOAD_IMAGE_GRAYSCALE);
 }
 
 unsigned int ImageProcessorImplementation::getNextQuality(unsigned int minQuality, unsigned int maxQuality)

@@ -102,6 +102,7 @@
     <ClCompile Include="source\ImageProcessor.cpp" />
     <ClCompile Include="source\ImageProcessorImplementation.cpp" />
     <ClCompile Include="source\ImageSimilarity.cpp" />
+    <ClCompile Include="Source\JpegEncoderDecoder.cpp" />
     <ClCompile Include="source\Logger.cpp" />
     <ClCompile Include="source\Severity.cpp" />
   </ItemGroup>
@@ -110,6 +111,7 @@
     <ClInclude Include="Include\Severity.h" />
     <ClInclude Include="Source\ImageProcessorImplementation.h" />
     <ClInclude Include="Source\ImageSimilarity.h" />
+    <ClInclude Include="Source\JpegEncoderDecoder.h" />
     <ClInclude Include="Source\Logger.h" />
   </ItemGroup>
   <ItemGroup>
