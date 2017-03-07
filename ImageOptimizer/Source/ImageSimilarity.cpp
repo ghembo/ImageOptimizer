@@ -162,6 +162,21 @@ namespace ImageSimilarity
 		return std::max(1, (int)(std::min(width, height) / 256.0f + 0.5f)); // TODO
 	}
 
+	std::unique_ptr<float[]> convertToFloat(uchar* image, int width, int height)
+	{
+		int size = width * height;
+
+		auto floatImage = std::make_unique<float[]>(size);
+		auto floatImagePointer = floatImage.get();
+
+		for (int i = 0; i < size; i++) // *p++ agambini unroll
+		{
+			floatImagePointer[i] = static_cast<float>(image[i]);
+		}
+
+		return floatImage;
+	}
+
 	// TODO usare int
 	float ComputeSsim(const cv::Mat& referenceImage, const cv::Mat& compareImage)
 	{
@@ -178,43 +193,19 @@ namespace ImageSimilarity
 		int width = referenceImage.cols;
 		int height = referenceImage.rows;
 
-		uchar* reference = referenceImage.data;
-		uchar* compare = compareImage.data;
-
 		/* Convert image values to floats. Forcing stride = width. */
-		float* ref_f = new float[width*height]; // reuse same allocated space
-		float* cmp_f = new float[width*height];
-
-		/*std::unique_ptr<float[]> referenceFloat(new float[width*height]);
-		std::unique_ptr<float[]> compareFloat(new float[width*height]);
-
-		auto ref_f = referenceFloat.get();
-		auto cmp_f = compareFloat.get();*/
-
-		for (int i = 0; i < width * height; i++) // *p++ agambini unroll
-		{
-			ref_f[i] = static_cast<float>(reference[i]);
-		}
-
-		for (int i = 0; i < width * height; i++) // *p++ agambini unroll
-		{
-			cmp_f[i] = static_cast<float>(compare[i]);
-		}
+		auto referenceFloat = convertToFloat(referenceImage.data, width, height);
+		auto compareFloat = convertToFloat(compareImage.data, width, height);
 
 		int scale = computeScale(width, height);
 
 		/* Scale the images down if required */
 		if (scale > 1)
 		{
-			decimate(ref_f, width, height, scale);
-			std::tie(width, height) = decimate(cmp_f, width, height, scale);
+			decimate(referenceFloat.get(), width, height, scale);
+			std::tie(width, height) = decimate(compareFloat.get(), width, height, scale);
 		}
 		
-		float result = ssim(ref_f, cmp_f, width, height);
-
-		delete[] ref_f;
-		delete[] cmp_f;
-
-		return result;
+		return ssim(referenceFloat.get(), compareFloat.get(), width, height);
 	}
 }
