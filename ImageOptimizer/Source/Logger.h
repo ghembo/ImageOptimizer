@@ -34,7 +34,7 @@ private:
 	static bool s_initialized;
 	static boost::shared_ptr<text_file_sink_t> s_textFileSink;
 
-	boost::log::sources::severity_logger<SeverityLevel> m_logger;
+	boost::log::sources::severity_channel_logger<SeverityLevel, std::string> m_logger;
 };
 
 #endif
