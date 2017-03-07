@@ -96,13 +96,6 @@ namespace ImageSimilarity
 
 	float ssim(float *ref, float *cmp, int width, int height)
 	{
-		constexpr int L = 255;
-		constexpr double K1 = 0.01;
-		constexpr double K2 = 0.03;
-
-		constexpr double C1 = (K1*L) * (K1*L);
-		constexpr double C2 = (K2*L) * (K2*L);
-
 		float* ref_mu = new float[width*height];
 		float* cmp_mu = new float[width*height];
 		float* ref_sigma_sqd = new float[width*height];
@@ -125,10 +118,16 @@ namespace ImageSimilarity
 		convolve(cmp_sigma_sqd, width, height, 0);
 		std::tie(width, height) = convolve(sigma_both, width, height, 0);
 
+		constexpr int L = 255;
+		constexpr float K1 = 0.01f;
+		constexpr float K2 = 0.03f;
+
+		constexpr float C1 = (K1*L) * (K1*L);
+		constexpr float C2 = (K2*L) * (K2*L);
+
 		double ssim_sum = 0.0;
 		float norm = 1.0f / (SQUARE_LEN * SQUARE_LEN);
 
-		/* The convolution results are smaller by the kernel width and height */
 		for (int offset = 0; offset < width * height; offset++)
 		{
 			ref_mu[offset] *= norm;
@@ -140,11 +139,11 @@ namespace ImageSimilarity
 			float ref_sigma_sqd_value = ref_sigma_sqd[offset] * norm - ref_mu_sq;
 			float cmp_sigma_sqd_value = cmp_sigma_sqd[offset] * norm - cmp_mu_sq;
 
-			double denominator = (ref_mu_sq + cmp_mu_sq + C1) * (ref_sigma_sqd_value + cmp_sigma_sqd_value + C2);
+			float denominator = (ref_mu_sq + cmp_mu_sq + C1) * (ref_sigma_sqd_value + cmp_sigma_sqd_value + C2);
 
 			float sigma_both_value = sigma_both[offset] * norm - ref_mu[offset] * cmp_mu[offset];
 
-			double numerator   = (2.0 * ref_mu[offset] * cmp_mu[offset] + C1) * (2.0 * sigma_both_value + C2);
+			float numerator   = (2.0f * ref_mu[offset] * cmp_mu[offset] + C1) * (2.0f * sigma_both_value + C2);
 			ssim_sum += numerator / denominator;
 		}
 
@@ -154,7 +153,7 @@ namespace ImageSimilarity
 		delete[] cmp_sigma_sqd;
 		delete[] sigma_both;
 
-		return (float)(ssim_sum / (double)(width*height));
+		return (float)(ssim_sum / (width * height));
 	}
 
 	int computeScale(int width, int height)
