@@ -10,7 +10,7 @@ int main()
 {
 	std::cout << ImageProcessor::GetVersion() << std::endl;
 
-	ImageProcessor::EnableFileLogging(SeverityLevel::warning, "Global");
+	ImageProcessor::EnableFileLogging(SeverityLevel::trace);
 
 	ImageProcessor imageOptimizer;
 
