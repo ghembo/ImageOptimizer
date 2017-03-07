@@ -43,6 +43,7 @@
 **/Debug/
 **/Release/
 **/LogFiles/
+**/Logs/
 **/Reports/
 **/Unused/
 **/Packages/
