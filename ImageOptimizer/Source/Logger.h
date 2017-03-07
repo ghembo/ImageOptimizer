@@ -24,6 +24,7 @@ public:
 
 	static void EnableFileLogging(SeverityLevel minimumSeverity, const std::string& component);
 	static void DisableFileLogging();
+	static void SetMinimumLoggingLevel(SeverityLevel minimumSeverity);
 
 private:
 	void TryInitialize();

@@ -135,3 +135,8 @@ void Logger::DisableFileLogging()
 
 	s_textFileSink.reset();
 }
+
+void Logger::SetMinimumLoggingLevel(SeverityLevel minimumSeverity)
+{
+	core::get()->set_filter(severity >= minimumSeverity);
+}

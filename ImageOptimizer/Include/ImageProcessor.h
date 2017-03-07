@@ -16,6 +16,7 @@ public:
 	~ImageProcessor();
 	
 	static void EnableFileLogging(SeverityLevel minimumSeverity = SeverityLevel::trace, const std::string& component = "");
+	static void SetMinimumLoggingLevel(SeverityLevel minimumSeverity);
 
 	static std::string GetVersion();
 

@@ -32,3 +32,7 @@ void ImageProcessor::EnableFileLogging( SeverityLevel minimumSeverity /*= trace*
 	Logger::EnableFileLogging(minimumSeverity, component);
 }
 
+void ImageProcessor::SetMinimumLoggingLevel(SeverityLevel minimumSeverity)
+{
+	Logger::SetMinimumLoggingLevel(minimumSeverity);
+}
