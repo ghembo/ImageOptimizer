@@ -62,24 +62,45 @@ void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 void ImageProcessorImplementation::optimizeImage(const cv::Mat& referenceImage)
 {
 	constexpr float targetSsim = 0.999f;
-	constexpr unsigned int maxNumberOfIterations = 10;
-	constexpr unsigned int startQuality = 70;
-
-	std::chrono::milliseconds millliseconds(0);
-
-	std::vector<std::pair<unsigned int, float>> qualities;
-
-	unsigned int minQuality = 0;
-	unsigned int maxQuality = 100;
 
 	auto start = std::chrono::steady_clock::now();
 
+	auto qualities = computeBestQuality(referenceImage, targetSsim);
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		computeBestQuality(referenceImage, targetSsim);
+	}
+
+	auto finish = std::chrono::steady_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+
+	auto numberOfIterations = qualities.size();
+
+	std::cout << duration.count() << "ms - " << numberOfIterations << " iterations" << std::endl;
+
+	std::cout.precision(std::numeric_limits<float>::max_digits10);
+
+	for each (auto quality in qualities)
+	{
+		std::cout << quality.first << " - " << quality.second << std::endl;
+	}
+}
+
+std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::computeBestQuality(const cv::Mat& referenceImage, float targetSsim)
+{
+	constexpr unsigned int maxNumberOfIterations = 10;
+
+	unsigned int minQuality = 0;
+	unsigned int maxQuality = 100;
+	unsigned int currentQuality = 70;
+
+	std::vector<std::pair<unsigned int, float>> qualities;
+
 	for (int i = 0; i < maxNumberOfIterations; i++)
 	{
-		auto currentQuality = getNextQuality(minQuality, maxQuality);
-
 		std::vector<uchar> buffer = memoryEncodeJpeg(referenceImage, currentQuality);
-		
+
 		auto compressedImage = memoryDecodeGrayscaleJpeg(buffer);
 
 		assert(compressedImage.data != NULL);
@@ -98,25 +119,17 @@ void ImageProcessorImplementation::optimizeImage(const cv::Mat& referenceImage)
 			minQuality = currentQuality;
 		}
 
-		if (getNextQuality(minQuality, maxQuality) == currentQuality)
+		auto nextQuality = getNextQuality(minQuality, maxQuality);
+
+		if (nextQuality == currentQuality)
 		{
 			break;
 		}
+
+		currentQuality = nextQuality;
 	}
 
-	auto finish = std::chrono::steady_clock::now();
-	millliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-
-	auto numberOfIterations = qualities.size();
-
-	std::cout << millliseconds.count() << "ms - " << numberOfIterations << " iterations" << std::endl;
-
-	std::cout.precision(std::numeric_limits<float>::max_digits10);
-
-	for each (auto quality in qualities)
-	{
-		std::cout << quality.first << " - " << quality.second << std::endl;
-	}
+	return qualities;
 }
 
 std::vector<uchar> ImageProcessorImplementation::memoryEncodeJpeg(const cv::Mat& image, unsigned int quality)

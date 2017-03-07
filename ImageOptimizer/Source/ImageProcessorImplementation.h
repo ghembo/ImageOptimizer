@@ -23,6 +23,7 @@ public:
 	
 private:
 	void optimizeImage(const cv::Mat& referenceImage);
+	std::vector<std::pair<unsigned int, float>> computeBestQuality(const cv::Mat& referenceImage, float targetSsim);
 
 	std::vector<uchar> memoryEncodeJpeg(const cv::Mat & image, unsigned int quality);
 	cv::Mat memoryDecodeGrayscaleJpeg(const std::vector<uchar>& buffer);
