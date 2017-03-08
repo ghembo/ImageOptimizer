@@ -21,40 +21,38 @@ using namespace boost::filesystem;
 ImageProcessorImplementation::ImageProcessorImplementation():
 	m_logger("ImgProc")
 {
-	m_logger.Log("Created");
 }
 
 ImageProcessorImplementation::~ImageProcessorImplementation()
 {
-	m_logger.Log("Destroyed");
 }
 
 void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 {
- 	m_logger.Log("Loading image");
+ 	m_logger.Log(imagePath.data());
  
  	path p(imagePath);
  
 	if (!exists(p))
 	{
-		throw std::invalid_argument("File doesn't exist");
+		handleInvalidArgument("File doesn't exist");
 	}
 
  	if(!is_regular_file(p))
  	{
-		throw std::invalid_argument("Path is not a file");
+		handleInvalidArgument("Path is not a file");
  	}
 
 	auto referenceImage = cv::imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
 
 	if (referenceImage.data == NULL)
 	{
-		throw std::invalid_argument("Image format not supported");
+		handleInvalidArgument("Image format not supported");
 	}
 
 	if (!referenceImage.isContinuous())
 	{
-		throw std::invalid_argument("Cannot efficiently process input image");
+		handleInvalidArgument("Cannot efficiently process input image");
 	}
 
 	optimizeImage(referenceImage);
@@ -136,4 +134,10 @@ std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::comput
 unsigned int ImageProcessorImplementation::getNextQuality(unsigned int minQuality, unsigned int maxQuality)
 {
 	return (minQuality + maxQuality) / 2;
+}
+
+void ImageProcessorImplementation::handleInvalidArgument(const char* message)
+{
+	m_logger.Log(message);
+	throw std::invalid_argument(message);
 }

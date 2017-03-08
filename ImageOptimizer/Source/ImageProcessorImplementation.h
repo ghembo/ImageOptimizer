@@ -30,6 +30,8 @@ private:
 
 	unsigned int getNextQuality(unsigned int minQuality, unsigned int maxQuality);
 
+	void handleInvalidArgument(const char* message);
+
 	Logger m_logger;
 };
 
