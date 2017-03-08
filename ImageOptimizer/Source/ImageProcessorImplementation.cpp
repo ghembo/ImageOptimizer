@@ -146,12 +146,16 @@ void ImageProcessorImplementation::handleInvalidArgument(const char* message)
 
 void ImageProcessorImplementation::logDurationAndResults(long long duration, const OptimizationSequence& results)
 {
-	std::cout << duration << "ms - " << results.GetNumberOfIterations() << " iterations" << std::endl;
+	std::ostringstream message;
 
-	std::cout.precision(std::numeric_limits<float>::max_digits10);
+	message << duration << "ms - " << results.GetNumberOfIterations() << " iterations" << std::endl;
+
+	message.precision(std::numeric_limits<float>::max_digits10);
 
 	for (auto result : results)
 	{
-		std::cout << result.first << " - " << result.second << std::endl;
+		message << result.first << " - " << result.second << std::endl;
 	}
+
+	m_logger.Log(message.str().c_str());
 }
