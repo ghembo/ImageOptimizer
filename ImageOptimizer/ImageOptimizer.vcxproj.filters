@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\ImageProcessor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\ImageSimilarity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,15 +33,15 @@
     <ClCompile Include="source\ImageOptimizerImplementation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\ImageOptimizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ImageSimilarity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\ImageProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Severity.h">
@@ -57,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\ImageOptimizerImplementation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ImageOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

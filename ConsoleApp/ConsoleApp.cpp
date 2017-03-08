@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "ImageProcessor.h"
+#include "ImageOptimizer.h"
 
 #include <iostream>
 
@@ -8,11 +8,11 @@
 
 int main()
 {
-	std::cout << ImageProcessor::GetVersion() << std::endl;
+	std::cout << ImageOptimizer::GetVersion() << std::endl;
 
-	ImageProcessor::EnableFileLogging();
+	ImageOptimizer::EnableFileLogging();
 
-	ImageProcessor imageOptimizer;
+	ImageOptimizer imageOptimizer;
 
 	imageOptimizer.OptimizeImage("C:\\Proj\\ImageOptimizer\\ImageOptimizer\\test.jpg");
 

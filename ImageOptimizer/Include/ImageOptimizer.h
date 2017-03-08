@@ -9,11 +9,11 @@
 class ImageOptimizerImplementation;
 
 
-class ImageProcessor
+class ImageOptimizer
 {
 public:
-	ImageProcessor();
-	~ImageProcessor();
+	ImageOptimizer();
+	~ImageOptimizer();
 	
 	static void EnableFileLogging(SeverityLevel minimumSeverity = SeverityLevel::trace, const std::string& component = "");
 	static void SetMinimumLoggingLevel(SeverityLevel minimumSeverity);
