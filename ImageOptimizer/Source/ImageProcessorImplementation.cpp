@@ -28,29 +28,38 @@ ImageProcessorImplementation::~ImageProcessorImplementation()
 {
 }
 
+std::string getNewFilename(const std::string& filename)
+{
+	path p(filename);
+
+	path newFilename = p.parent_path() / path(p.stem().string() + "_compressed" + p.extension().string());
+
+	return newFilename.string();
+}
+
 void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 {
  	m_logger.Log(imagePath.data());
 
-	auto referenceImage = loadImage(imagePath);
+	auto image = loadImage(imagePath);
 
-	if (referenceImage.data == NULL)
+	if (image.data == NULL)
 	{
 		handleInvalidArgument("Image format not supported");
 	}
 
-	if (!referenceImage.isContinuous())
+	if (!image.isContinuous())
 	{
 		handleInvalidArgument("Cannot efficiently process input image");
 	}	
 	
-	auto bestQuality = optimizeImage(referenceImage);
+	auto bestQuality = optimizeImage(image);
 
-	referenceImage.release();
+	image.release();
 
-	referenceImage = JpegEncoderDecoder::LoadColorImage(imagePath);
+	image = JpegEncoderDecoder::LoadColorImage(imagePath);
 
-	JpegEncoderDecoder::SaveJpeg(referenceImage, imagePath + "_", bestQuality);
+	JpegEncoderDecoder::SaveJpeg(image, getNewFilename(imagePath), bestQuality);
 }
 
 cv::Mat ImageProcessorImplementation::loadImage(const std::string& imagePath)
