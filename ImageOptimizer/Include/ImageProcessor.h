@@ -6,7 +6,7 @@
 
 #include "Severity.h"
 
-class ImageProcessorImplementation;
+class ImageOptimizer;
 
 
 class ImageProcessor
@@ -23,7 +23,7 @@ public:
 	void OptimizeImage(const std::string& imagePath);
 
 private:
-	std::unique_ptr<ImageProcessorImplementation> m_implementation;
+	std::unique_ptr<ImageOptimizer> m_implementation;
 
 	static const std::string s_version;
 };
