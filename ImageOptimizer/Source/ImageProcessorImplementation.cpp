@@ -148,7 +148,7 @@ void ImageProcessorImplementation::logDurationAndResults(long long duration, con
 {
 	std::ostringstream message;
 
-	message << duration << "ms - " << results.GetNumberOfIterations() << " iterations" << std::endl;
+	message << duration << "ms - " << results.NumberOfIterations() << " iterations" << std::endl;
 
 	message.precision(std::numeric_limits<float>::max_digits10);
 

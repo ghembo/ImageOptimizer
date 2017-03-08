@@ -13,8 +13,8 @@ private:
 
 public:
 	void AddOptimizationResult(unsigned int quality, float ssim);
-	unsigned int GetBestQuality() const;
-	unsigned int GetNumberOfIterations() const;
+	unsigned int BestQuality() const;
+	unsigned int NumberOfIterations() const;
 
 	using iterator = sequence_t::iterator;
 	using const_iterator = sequence_t::const_iterator;
