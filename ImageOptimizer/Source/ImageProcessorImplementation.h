@@ -6,12 +6,13 @@
 #include "opencv2/core/hal/interface.h"
 
 #include <string>
-#include <vector>
 
 namespace cv
 {
 	class Mat;
 }
+
+class OptimizationSequence;
 
 class  ImageProcessorImplementation
 {
@@ -24,7 +25,7 @@ public:
 private:
 	cv::Mat loadImage(const std::string& imagePath);
 	void optimizeImage(const cv::Mat& image);
-	std::vector<std::pair<unsigned int, float>> computeBestQuality(const cv::Mat& image, float targetSsim);
+	OptimizationSequence computeBestQuality(const cv::Mat& image, float targetSsim);
 	float computeSsim(const cv::Mat& image, unsigned int quality);
 
 	unsigned int getNextQuality(unsigned int minQuality, unsigned int maxQuality);

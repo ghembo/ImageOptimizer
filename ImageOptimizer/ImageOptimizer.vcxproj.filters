@@ -33,6 +33,9 @@
     <ClCompile Include="Source\JpegEncoderDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\OptimizationSequence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ImageSimilarity.h">
@@ -51,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\JpegEncoderDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\OptimizationSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

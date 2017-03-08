@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "ImageSimilarity.h"
 #include "JpegEncoderDecoder.h"
+#include "OptimizationSequence.h"
 
 #include "opencv2\opencv.hpp"
 #include "opencv2\core\core.hpp"
@@ -79,19 +80,17 @@ void ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
 	auto finish = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
 
-	auto numberOfIterations = qualities.size();
-
-	std::cout << duration.count() << "ms - " << numberOfIterations << " iterations" << std::endl;
+	std::cout << duration.count() << "ms - " << qualities.GetNumberOfIterations() << " iterations" << std::endl;
 
 	std::cout.precision(std::numeric_limits<float>::max_digits10);
 
-	for each (auto quality in qualities)
+	for (auto quality: qualities)
 	{
 		std::cout << quality.first << " - " << quality.second << std::endl;
 	}
 }
 
-std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::computeBestQuality(const cv::Mat& image, float targetSsim)
+OptimizationSequence ImageProcessorImplementation::computeBestQuality(const cv::Mat& image, float targetSsim)
 {
 	constexpr unsigned int maxNumberOfIterations = 10;
 
@@ -99,13 +98,13 @@ std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::comput
 	unsigned int maxQuality = 100;
 	unsigned int currentQuality = 70;
 
-	std::vector<std::pair<unsigned int, float>> qualities;
+	OptimizationSequence qualities;
 
 	for (int i = 0; i < maxNumberOfIterations; i++)
 	{
 		auto ssim = computeSsim(image, currentQuality);
 
-		qualities.push_back(std::make_pair(currentQuality, ssim));
+		qualities.AddOptimizationResult(currentQuality, ssim);
 
 		if (ssim > targetSsim)
 		{

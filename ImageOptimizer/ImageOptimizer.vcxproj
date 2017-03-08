@@ -104,6 +104,7 @@
     <ClCompile Include="source\ImageSimilarity.cpp" />
     <ClCompile Include="Source\JpegEncoderDecoder.cpp" />
     <ClCompile Include="source\Logger.cpp" />
+    <ClCompile Include="Source\OptimizationSequence.cpp" />
     <ClCompile Include="source\Severity.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +114,7 @@
     <ClInclude Include="Source\ImageSimilarity.h" />
     <ClInclude Include="Source\JpegEncoderDecoder.h" />
     <ClInclude Include="Source\Logger.h" />
+    <ClInclude Include="Source\OptimizationSequence.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
