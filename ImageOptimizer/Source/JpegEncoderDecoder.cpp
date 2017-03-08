@@ -23,3 +23,8 @@ cv::Mat JpegEncoderDecoder::MemoryDecodeGrayscaleJpeg(const std::vector<uchar>& 
 {
 	return cv::imdecode(buffer, CV_LOAD_IMAGE_GRAYSCALE);
 }
+
+cv::Mat JpegEncoderDecoder::LoadImage(const std::string& imagePath)
+{
+	return cv::imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
+}

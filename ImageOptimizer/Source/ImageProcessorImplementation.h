@@ -22,6 +22,7 @@ public:
 	void OptimizeImage(const std::string& imagePath);
 	
 private:
+	cv::Mat loadImage(const std::string& imagePath);
 	void optimizeImage(const cv::Mat& image);
 	std::vector<std::pair<unsigned int, float>> computeBestQuality(const cv::Mat& image, float targetSsim);
 	float computeSsim(const cv::Mat& image, unsigned int quality);

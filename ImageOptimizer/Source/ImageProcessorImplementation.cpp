@@ -30,20 +30,8 @@ ImageProcessorImplementation::~ImageProcessorImplementation()
 void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 {
  	m_logger.Log(imagePath.data());
- 
- 	path p(imagePath);
- 
-	if (!exists(p))
-	{
-		handleInvalidArgument("File doesn't exist");
-	}
 
- 	if(!is_regular_file(p))
- 	{
-		handleInvalidArgument("Path is not a file");
- 	}
-
-	auto referenceImage = cv::imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
+	auto referenceImage = loadImage(imagePath);
 
 	if (referenceImage.data == NULL)
 	{
@@ -56,6 +44,23 @@ void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 	}
 
 	optimizeImage(referenceImage);
+}
+
+cv::Mat ImageProcessorImplementation::loadImage(const std::string& imagePath)
+{
+	path p(imagePath);
+
+	if (!exists(p))
+	{
+		handleInvalidArgument("File doesn't exist");
+	}
+
+	if (!is_regular_file(p))
+	{
+		handleInvalidArgument("Path is not a file");
+	}
+
+	return JpegEncoderDecoder::LoadImage(imagePath);
 }
 
 void ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
