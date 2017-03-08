@@ -58,17 +58,17 @@ void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 	optimizeImage(referenceImage);
 }
 
-void ImageProcessorImplementation::optimizeImage(const cv::Mat& referenceImage)
+void ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
 {
 	constexpr float targetSsim = 0.999f;
 
 	auto start = std::chrono::steady_clock::now();
 
-	auto qualities = computeBestQuality(referenceImage, targetSsim);
+	auto qualities = computeBestQuality(image, targetSsim);
 
 	for (size_t i = 0; i < 10; i++)
 	{
-		computeBestQuality(referenceImage, targetSsim);
+		computeBestQuality(image, targetSsim);
 	}
 
 	auto finish = std::chrono::steady_clock::now();
@@ -86,7 +86,7 @@ void ImageProcessorImplementation::optimizeImage(const cv::Mat& referenceImage)
 	}
 }
 
-std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::computeBestQuality(const cv::Mat& referenceImage, float targetSsim)
+std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::computeBestQuality(const cv::Mat& image, float targetSsim)
 {
 	constexpr unsigned int maxNumberOfIterations = 10;
 
@@ -98,14 +98,7 @@ std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::comput
 
 	for (int i = 0; i < maxNumberOfIterations; i++)
 	{
-		std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(referenceImage, currentQuality);
-
-		auto compressedImage = JpegEncoderDecoder::MemoryDecodeGrayscaleJpeg(buffer);
-
-		assert(compressedImage.data != NULL);
-		assert(compressedImage.isContinuous());
-
-		float ssim = ImageSimilarity::ComputeSsim(referenceImage, compressedImage);
+		auto ssim = computeSsim(image, currentQuality);
 
 		qualities.push_back(std::make_pair(currentQuality, ssim));
 
@@ -129,6 +122,18 @@ std::vector<std::pair<unsigned int, float>> ImageProcessorImplementation::comput
 	}
 
 	return qualities;
+}
+
+float ImageProcessorImplementation::computeSsim(const cv::Mat& image, unsigned int quality)
+{
+	std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(image, quality);
+
+	auto compressedImage = JpegEncoderDecoder::MemoryDecodeGrayscaleJpeg(buffer);
+
+	assert(compressedImage.data != NULL);
+	assert(compressedImage.isContinuous());
+
+	return ImageSimilarity::ComputeSsim(image, compressedImage);
 }
 
 unsigned int ImageProcessorImplementation::getNextQuality(unsigned int minQuality, unsigned int maxQuality)
