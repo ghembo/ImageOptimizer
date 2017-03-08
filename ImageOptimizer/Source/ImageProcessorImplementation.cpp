@@ -78,11 +78,6 @@ unsigned int ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
 
 	auto qualities = searchBestQuality(image, targetSsim);
 
-	for (size_t i = 0; i < 10; i++)
-	{
-		searchBestQuality(image, targetSsim);
-	}
-
 	auto finish = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();
 
