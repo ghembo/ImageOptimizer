@@ -33,7 +33,7 @@
     <ClCompile Include="Source\OptimizationSequence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\ImageOptimizer.cpp">
+    <ClCompile Include="source\ImageOptimizerImplementation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,7 +56,7 @@
     <ClInclude Include="Source\OptimizationSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ImageOptimizer.h">
+    <ClInclude Include="Source\ImageOptimizerImplementation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

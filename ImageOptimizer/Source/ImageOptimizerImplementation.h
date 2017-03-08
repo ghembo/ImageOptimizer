@@ -14,11 +14,11 @@ namespace cv
 
 class OptimizationSequence;
 
-class  ImageOptimizer
+class  ImageOptimizerImplementation
 {
 public:
-	ImageOptimizer();
-	~ImageOptimizer();
+	ImageOptimizerImplementation();
+	~ImageOptimizerImplementation();
 
 	void OptimizeImage(const std::string& imagePath);
 	

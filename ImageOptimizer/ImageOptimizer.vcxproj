@@ -100,7 +100,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\ImageProcessor.cpp" />
-    <ClCompile Include="source\ImageOptimizer.cpp" />
+    <ClCompile Include="source\ImageOptimizerImplementation.cpp" />
     <ClCompile Include="source\ImageSimilarity.cpp" />
     <ClCompile Include="Source\JpegEncoderDecoder.cpp" />
     <ClCompile Include="source\Logger.cpp" />
@@ -110,7 +110,7 @@
   <ItemGroup>
     <ClInclude Include="Include\ImageProcessor.h" />
     <ClInclude Include="Include\Severity.h" />
-    <ClInclude Include="Source\ImageOptimizer.h" />
+    <ClInclude Include="Source\ImageOptimizerImplementation.h" />
     <ClInclude Include="Source\ImageSimilarity.h" />
     <ClInclude Include="Source\JpegEncoderDecoder.h" />
     <ClInclude Include="Source\Logger.h" />

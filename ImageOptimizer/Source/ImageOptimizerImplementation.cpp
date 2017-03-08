@@ -1,4 +1,4 @@
-#include "ImageOptimizer.h"
+#include "ImageOptimizerImplementation.h"
 
 #include "Logger.h"
 #include "ImageSimilarity.h"
@@ -19,12 +19,12 @@ using namespace boost::filesystem;
 
 
 
-ImageOptimizer::ImageOptimizer():
+ImageOptimizerImplementation::ImageOptimizerImplementation():
 	m_logger("ImgProc")
 {
 }
 
-ImageOptimizer::~ImageOptimizer()
+ImageOptimizerImplementation::~ImageOptimizerImplementation()
 {
 }
 
@@ -37,7 +37,7 @@ std::string getNewFilename(const std::string& filename)
 	return newFilename.string();
 }
 
-void ImageOptimizer::OptimizeImage( const std::string& imagePath )
+void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
 {
  	m_logger.Log(imagePath.data());
 
@@ -62,7 +62,7 @@ void ImageOptimizer::OptimizeImage( const std::string& imagePath )
 	JpegEncoderDecoder::SaveJpeg(image, getNewFilename(imagePath), bestQuality);
 }
 
-cv::Mat ImageOptimizer::loadImage(const std::string& imagePath)
+cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
 {
 	path p(imagePath);
 
@@ -79,7 +79,7 @@ cv::Mat ImageOptimizer::loadImage(const std::string& imagePath)
 	return JpegEncoderDecoder::LoadGrayscaleImage(imagePath);
 }
 
-unsigned int ImageOptimizer::optimizeImage(const cv::Mat& image)
+unsigned int ImageOptimizerImplementation::optimizeImage(const cv::Mat& image)
 {
 	constexpr float targetSsim = 0.999f;
 
@@ -95,7 +95,7 @@ unsigned int ImageOptimizer::optimizeImage(const cv::Mat& image)
 	return qualities.BestQuality();
 }
 
-OptimizationSequence ImageOptimizer::searchBestQuality(const cv::Mat& image, float targetSsim)
+OptimizationSequence ImageOptimizerImplementation::searchBestQuality(const cv::Mat& image, float targetSsim)
 {
 	constexpr unsigned int maxNumberOfIterations = 10;
 
@@ -133,7 +133,7 @@ OptimizationSequence ImageOptimizer::searchBestQuality(const cv::Mat& image, flo
 	return qualities;
 }
 
-float ImageOptimizer::computeSsim(const cv::Mat& image, unsigned int quality)
+float ImageOptimizerImplementation::computeSsim(const cv::Mat& image, unsigned int quality)
 {
 	std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(image, quality);
 
@@ -145,18 +145,18 @@ float ImageOptimizer::computeSsim(const cv::Mat& image, unsigned int quality)
 	return ImageSimilarity::ComputeSsim(image, compressedImage);
 }
 
-unsigned int ImageOptimizer::getNextQuality(unsigned int minQuality, unsigned int maxQuality)
+unsigned int ImageOptimizerImplementation::getNextQuality(unsigned int minQuality, unsigned int maxQuality)
 {
 	return (minQuality + maxQuality) / 2;
 }
 
-void ImageOptimizer::handleInvalidArgument(const char* message)
+void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
 {
 	m_logger.Log(message);
 	throw std::invalid_argument(message);
 }
 
-void ImageOptimizer::logDurationAndResults(long long duration, const OptimizationSequence& results)
+void ImageOptimizerImplementation::logDurationAndResults(long long duration, const OptimizationSequence& results)
 {
 	std::ostringstream message;
 

@@ -1,6 +1,6 @@
 #include "ImageProcessor.h"
 
-#include "ImageOptimizer.h"
+#include "ImageOptimizerImplementation.h"
 
 #include "opencv2/opencv.hpp"
 
@@ -14,7 +14,7 @@ std::string ImageProcessor::GetVersion()
 }
 
 ImageProcessor::ImageProcessor() :
-	m_implementation(new ImageOptimizer())
+	m_implementation(new ImageOptimizerImplementation())
 {
 }
 
