@@ -24,8 +24,8 @@ public:
 	
 private:
 	cv::Mat loadImage(const std::string& imagePath);
-	void optimizeImage(const cv::Mat& image);
-	OptimizationSequence computeBestQuality(const cv::Mat& image, float targetSsim);
+	unsigned int optimizeImage(const cv::Mat& image);
+	OptimizationSequence searchBestQuality(const cv::Mat& image, float targetSsim);
 	float computeSsim(const cv::Mat& image, unsigned int quality);
 
 	unsigned int getNextQuality(unsigned int minQuality, unsigned int maxQuality);

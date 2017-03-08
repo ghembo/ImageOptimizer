@@ -42,9 +42,15 @@ void ImageProcessorImplementation::OptimizeImage( const std::string& imagePath )
 	if (!referenceImage.isContinuous())
 	{
 		handleInvalidArgument("Cannot efficiently process input image");
-	}
+	}	
+	
+	auto bestQuality = optimizeImage(referenceImage);
 
-	optimizeImage(referenceImage);
+	referenceImage.release();
+
+	referenceImage = JpegEncoderDecoder::LoadColorImage(imagePath);
+
+	JpegEncoderDecoder::SaveJpeg(referenceImage, imagePath + "_", bestQuality);
 }
 
 cv::Mat ImageProcessorImplementation::loadImage(const std::string& imagePath)
@@ -61,29 +67,31 @@ cv::Mat ImageProcessorImplementation::loadImage(const std::string& imagePath)
 		handleInvalidArgument("Path is not a file");
 	}
 
-	return JpegEncoderDecoder::LoadImage(imagePath);
+	return JpegEncoderDecoder::LoadGrayscaleImage(imagePath);
 }
 
-void ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
+unsigned int ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
 {
 	constexpr float targetSsim = 0.999f;
 
 	auto start = std::chrono::steady_clock::now();
 
-	auto qualities = computeBestQuality(image, targetSsim);
+	auto qualities = searchBestQuality(image, targetSsim);
 
 	for (size_t i = 0; i < 10; i++)
 	{
-		computeBestQuality(image, targetSsim);
+		searchBestQuality(image, targetSsim);
 	}
 
 	auto finish = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();
 
 	logDurationAndResults(duration, qualities);
+
+	return qualities.BestQuality();
 }
 
-OptimizationSequence ImageProcessorImplementation::computeBestQuality(const cv::Mat& image, float targetSsim)
+OptimizationSequence ImageProcessorImplementation::searchBestQuality(const cv::Mat& image, float targetSsim)
 {
 	constexpr unsigned int maxNumberOfIterations = 10;
 
