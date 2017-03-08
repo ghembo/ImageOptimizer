@@ -32,6 +32,8 @@ private:
 
 	void handleInvalidArgument(const char* message);
 
+	void logDurationAndResults(long long duration, const OptimizationSequence& results);
+
 	Logger m_logger;
 };
 

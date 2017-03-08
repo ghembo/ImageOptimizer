@@ -78,16 +78,9 @@ void ImageProcessorImplementation::optimizeImage(const cv::Mat& image)
 	}
 
 	auto finish = std::chrono::steady_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();
 
-	std::cout << duration.count() << "ms - " << qualities.GetNumberOfIterations() << " iterations" << std::endl;
-
-	std::cout.precision(std::numeric_limits<float>::max_digits10);
-
-	for (auto quality: qualities)
-	{
-		std::cout << quality.first << " - " << quality.second << std::endl;
-	}
+	logDurationAndResults(duration, qualities);
 }
 
 OptimizationSequence ImageProcessorImplementation::computeBestQuality(const cv::Mat& image, float targetSsim)
@@ -149,4 +142,16 @@ void ImageProcessorImplementation::handleInvalidArgument(const char* message)
 {
 	m_logger.Log(message);
 	throw std::invalid_argument(message);
+}
+
+void ImageProcessorImplementation::logDurationAndResults(long long duration, const OptimizationSequence& results)
+{
+	std::cout << duration << "ms - " << results.GetNumberOfIterations() << " iterations" << std::endl;
+
+	std::cout.precision(std::numeric_limits<float>::max_digits10);
+
+	for (auto result : results)
+	{
+		std::cout << result.first << " - " << result.second << std::endl;
+	}
 }
