@@ -34,6 +34,11 @@ unsigned int ImageProcessor::OptimizeImage(const cv::Mat& image)
 	return qualities.BestQuality();
 }
 
+auto getNextQualityRange(unsigned int quality, float currentSsim, float targetSsim, unsigned  int minQuality, unsigned  int maxQuality)
+{
+	return (currentSsim > targetSsim) ? std::make_pair(minQuality, quality) : std::make_pair(quality, maxQuality);
+}
+
 OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, float targetSsim)
 {
 	unsigned int minQuality = 0;
@@ -49,14 +54,7 @@ OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, flo
 
 		qualities.AddOptimizationResult(quality, ssim);
 
-		if (ssim > targetSsim)
-		{
-			maxQuality = quality;
-		}
-		else
-		{
-			minQuality = quality;
-		}
+		std::tie(minQuality, maxQuality) = getNextQualityRange(quality, ssim, targetSsim, minQuality, maxQuality);
 
 		quality = getNextQuality(minQuality, maxQuality);
 	}
