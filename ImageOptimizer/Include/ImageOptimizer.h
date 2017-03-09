@@ -21,6 +21,7 @@ public:
 	static std::string GetVersion();
 
 	void OptimizeImage(const std::string& imagePath);
+	void OptimizeFolder(const std::string& folderPath);
 
 private:
 	std::unique_ptr<ImageOptimizerImplementation> m_implementation;

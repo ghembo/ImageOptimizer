@@ -19,6 +19,7 @@ public:
 	ImageOptimizerImplementation();
 
 	void OptimizeImage(const std::string& imagePath);
+	void OptimizeFolder(const std::string& imageFolderPath);
 	
 private:
 	cv::Mat loadImage(const std::string& imagePath);

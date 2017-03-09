@@ -6,6 +6,8 @@
 #include "opencv2\core\core.hpp"
 
 #include <boost/filesystem.hpp>
+#include <boost/range/algorithm.hpp>
+#include <boost/range/adaptor/filtered.hpp>
 
 #include <string>
 
@@ -25,6 +27,40 @@ std::string getNewFilename(const std::string& filename)
 	path newFilename = p.parent_path() / path(p.stem().string() + "_compressed" + p.extension().string());
 
 	return newFilename.string();
+}
+
+bool isJpegFile(const directory_entry& file)
+{
+	auto extension = file.path().extension();
+
+	return is_regular_file(file) && (extension == ".jpg") || (extension == ".jpeg");
+}
+
+void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath)
+{
+	m_logger.Log(imageFolderPath.data());
+
+	path p(imageFolderPath);
+
+	if (!exists(p))
+	{
+		handleInvalidArgument("Folder doesn't exist");
+	}
+
+	if (!is_directory(p))
+	{
+		handleInvalidArgument("Path is not a folder");
+	}
+
+	std::vector<std::string> filenames;
+
+	boost::transform(boost::make_iterator_range(directory_iterator(p), {}) | boost::adaptors::filtered(isJpegFile),
+		back_inserter(filenames), [](const auto& file) {return file.path().string(); });
+	
+	for (const auto& filename : filenames)
+	{
+		OptimizeImage(filename);
+	}
 }
 
 void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
