@@ -97,37 +97,29 @@ unsigned int ImageOptimizerImplementation::optimizeImage(const cv::Mat& image)
 
 OptimizationSequence ImageOptimizerImplementation::searchBestQuality(const cv::Mat& image, float targetSsim)
 {
-	constexpr unsigned int maxNumberOfIterations = 10;
-
 	unsigned int minQuality = 0;
 	unsigned int maxQuality = 100;
-	unsigned int currentQuality = 70;
 
 	OptimizationSequence qualities;
 
-	for (int i = 0; i < maxNumberOfIterations; i++)
-	{
-		auto ssim = computeSsim(image, currentQuality);
+	auto quality = getNextQuality(minQuality, maxQuality);
 
-		qualities.AddOptimizationResult(currentQuality, ssim);
+	while (!qualities.HasBeenTried(quality))
+	{
+		auto ssim = computeSsim(image, quality);
+
+		qualities.AddOptimizationResult(quality, ssim);
 
 		if (ssim > targetSsim)
 		{
-			maxQuality = currentQuality;
+			maxQuality = quality;
 		}
 		else
 		{
-			minQuality = currentQuality;
+			minQuality = quality;
 		}
 
-		auto nextQuality = getNextQuality(minQuality, maxQuality);
-
-		if (nextQuality == currentQuality)
-		{
-			break;
-		}
-
-		currentQuality = nextQuality;
+		quality = getNextQuality(minQuality, maxQuality);
 	}
 
 	return qualities;
