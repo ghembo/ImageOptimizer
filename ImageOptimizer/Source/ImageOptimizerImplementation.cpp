@@ -1,30 +1,20 @@
 #include "ImageOptimizerImplementation.h"
 
 #include "Logger.h"
-#include "ImageSimilarity.h"
 #include "JpegEncoderDecoder.h"
-#include "OptimizationSequence.h"
 
-#include "opencv2\opencv.hpp"
 #include "opencv2\core\core.hpp"
 
 #include <boost/filesystem.hpp>
-#include <chrono>
 
-#include <cassert>
 #include <string>
-#include <utility>
 
 using namespace boost::filesystem;
 
 
 
 ImageOptimizerImplementation::ImageOptimizerImplementation():
-	m_logger("ImgProc")
-{
-}
-
-ImageOptimizerImplementation::~ImageOptimizerImplementation()
+	m_logger("ImgOpt")
 {
 }
 
@@ -53,7 +43,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
 		handleInvalidArgument("Cannot efficiently process input image");
 	}	
 	
-	auto bestQuality = optimizeImage(image);
+	auto bestQuality = m_imageProcessor.OptimizeImage(image);
 
 	image.release();
 
@@ -79,87 +69,8 @@ cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
 	return JpegEncoderDecoder::LoadGrayscaleImage(imagePath);
 }
 
-unsigned int ImageOptimizerImplementation::optimizeImage(const cv::Mat& image)
-{
-	constexpr float targetSsim = 0.999f;
-
-	auto start = std::chrono::steady_clock::now();
-
-	auto qualities = searchBestQuality(image, targetSsim);
-
-	auto finish = std::chrono::steady_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();
-
-	logDurationAndResults(duration, qualities);
-
-	return qualities.BestQuality();
-}
-
-OptimizationSequence ImageOptimizerImplementation::searchBestQuality(const cv::Mat& image, float targetSsim)
-{
-	unsigned int minQuality = 0;
-	unsigned int maxQuality = 100;
-
-	OptimizationSequence qualities;
-
-	auto quality = getNextQuality(minQuality, maxQuality);
-
-	while (!qualities.HasBeenTried(quality))
-	{
-		auto ssim = computeSsim(image, quality);
-
-		qualities.AddOptimizationResult(quality, ssim);
-
-		if (ssim > targetSsim)
-		{
-			maxQuality = quality;
-		}
-		else
-		{
-			minQuality = quality;
-		}
-
-		quality = getNextQuality(minQuality, maxQuality);
-	}
-
-	return qualities;
-}
-
-float ImageOptimizerImplementation::computeSsim(const cv::Mat& image, unsigned int quality)
-{
-	std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(image, quality);
-
-	auto compressedImage = JpegEncoderDecoder::MemoryDecodeGrayscaleJpeg(buffer);
-
-	assert(compressedImage.data != NULL);
-	assert(compressedImage.isContinuous());
-
-	return ImageSimilarity::ComputeSsim(image, compressedImage);
-}
-
-unsigned int ImageOptimizerImplementation::getNextQuality(unsigned int minQuality, unsigned int maxQuality)
-{
-	return (minQuality + maxQuality) / 2;
-}
-
 void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
 {
 	m_logger.Log(message);
 	throw std::invalid_argument(message);
-}
-
-void ImageOptimizerImplementation::logDurationAndResults(long long duration, const OptimizationSequence& results)
-{
-	std::ostringstream message;
-
-	message << duration << "ms - " << results.NumberOfIterations() << " iterations" << std::endl;
-
-	message.precision(std::numeric_limits<float>::max_digits10);
-
-	for (auto result : results)
-	{
-		message << result.first << " - " << result.second << std::endl;
-	}
-
-	m_logger.Log(message.str().c_str());
 }

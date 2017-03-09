@@ -1,5 +1,5 @@
-#ifndef ImageProcessor_h__
-#define ImageProcessor_h__
+#ifndef ImageOptimizer_h__
+#define ImageOptimizer_h__
 
 #include <string>
 #include <memory>
@@ -28,4 +28,4 @@ private:
 	static const std::string s_version;
 };
 
-#endif // ImageProcessor_h__
+#endif // ImageOptimizer_h__

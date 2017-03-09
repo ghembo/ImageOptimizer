@@ -2,8 +2,7 @@
 #define ImageProcessorImplementation_h__
 
 #include "Logger.h"
-
-#include "opencv2/core/hal/interface.h"
+#include "ImageProcessor.h"
 
 #include <string>
 
@@ -18,21 +17,15 @@ class  ImageOptimizerImplementation
 {
 public:
 	ImageOptimizerImplementation();
-	~ImageOptimizerImplementation();
 
 	void OptimizeImage(const std::string& imagePath);
 	
 private:
 	cv::Mat loadImage(const std::string& imagePath);
-	unsigned int optimizeImage(const cv::Mat& image);
-	OptimizationSequence searchBestQuality(const cv::Mat& image, float targetSsim);
-	float computeSsim(const cv::Mat& image, unsigned int quality);
-
-	unsigned int getNextQuality(unsigned int minQuality, unsigned int maxQuality);
 
 	void handleInvalidArgument(const char* message);
 
-	void logDurationAndResults(long long duration, const OptimizationSequence& results);
+	ImageProcessor m_imageProcessor;
 
 	Logger m_logger;
 };
