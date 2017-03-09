@@ -21,22 +21,6 @@ ImageOptimizerImplementation::ImageOptimizerImplementation():
 {
 }
 
-std::string ImageOptimizerImplementation::getNewFilename(const std::string& filename)
-{
-	path p(filename);
-
-	path newFilename = p.parent_path() / path(p.stem().string() + "_compressed" + p.extension().string());
-
-	return newFilename.string();
-}
-
-bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
-{
-	const std::regex jpegExtension(R"(^\.jpe?g$)", std::regex_constants::icase);
-
-	return std::regex_match(file.path().extension().string(), jpegExtension);
-}
-
 auto ImageOptimizerImplementation::getJpegInFolder(const std::string& imageFolderPath)
 {
 	std::vector<std::string> filenames;
@@ -117,4 +101,20 @@ void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
 {
 	m_logger.Log(message);
 	throw std::invalid_argument(message);
+}
+
+std::string ImageOptimizerImplementation::getNewFilename(const std::string& filename)
+{
+	path p(filename);
+
+	path newFilename = p.parent_path() / path(p.stem().string() + "_compressed" + p.extension().string());
+
+	return newFilename.string();
+}
+
+bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
+{
+	const std::regex jpegExtension(R"(^\.jpe?g$)", std::regex_constants::icase);
+
+	return std::regex_match(file.path().extension().string(), jpegExtension);
 }
