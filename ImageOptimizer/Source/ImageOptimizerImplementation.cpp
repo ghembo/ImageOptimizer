@@ -10,6 +10,7 @@
 #include <boost/range/adaptor/filtered.hpp>
 
 #include <string>
+#include <regex>
 
 using namespace boost::filesystem;
 
@@ -31,9 +32,9 @@ std::string getNewFilename(const std::string& filename)
 
 bool isJpegFile(const directory_entry& file)
 {
-	auto extension = file.path().extension();
+	const std::regex jpegExtension("\.jpe?g", std::regex_constants::icase);
 
-	return is_regular_file(file) && (extension == ".jpg") || (extension == ".jpeg");
+	return std::regex_match(file.path().extension().string(), jpegExtension);
 }
 
 void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath)
