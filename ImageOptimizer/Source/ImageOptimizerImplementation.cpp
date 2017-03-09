@@ -21,7 +21,7 @@ ImageOptimizerImplementation::ImageOptimizerImplementation():
 {
 }
 
-std::string getNewFilename(const std::string& filename)
+std::string ImageOptimizerImplementation::getNewFilename(const std::string& filename)
 {
 	path p(filename);
 
@@ -30,11 +30,21 @@ std::string getNewFilename(const std::string& filename)
 	return newFilename.string();
 }
 
-bool isJpegFile(const directory_entry& file)
+bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 {
-	const std::regex jpegExtension("\.jpe?g", std::regex_constants::icase);
+	const std::regex jpegExtension(R"(^\.jpe?g$)", std::regex_constants::icase);
 
 	return std::regex_match(file.path().extension().string(), jpegExtension);
+}
+
+auto ImageOptimizerImplementation::getJpegInFolder(const std::string& imageFolderPath)
+{
+	std::vector<std::string> filenames;
+
+	boost::transform(boost::make_iterator_range(directory_iterator(path(imageFolderPath)), {}) | boost::adaptors::filtered(isJpegFile),
+		back_inserter(filenames), [](const auto& file) {return file.path().string(); });
+
+	return filenames;
 }
 
 void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath)
@@ -53,11 +63,8 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 		handleInvalidArgument("Path is not a folder");
 	}
 
-	std::vector<std::string> filenames;
+	auto filenames = getJpegInFolder(imageFolderPath);
 
-	boost::transform(boost::make_iterator_range(directory_iterator(p), {}) | boost::adaptors::filtered(isJpegFile),
-		back_inserter(filenames), [](const auto& file) {return file.path().string(); });
-	
 	for (const auto& filename : filenames)
 	{
 		OptimizeImage(filename);

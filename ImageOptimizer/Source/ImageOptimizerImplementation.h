@@ -11,6 +11,14 @@ namespace cv
 	class Mat;
 }
 
+namespace boost
+{
+	namespace filesystem
+	{
+		class directory_entry;
+	}
+}
+
 class OptimizationSequence;
 
 class  ImageOptimizerImplementation
@@ -22,9 +30,13 @@ public:
 	void OptimizeFolder(const std::string& imageFolderPath);
 	
 private:
+	static std::string getNewFilename(const std::string& filename);
+	static bool isJpegFile(const boost::filesystem::directory_entry& file);
+	static auto getJpegInFolder(const std::string& imageFolderPath);
+
 	cv::Mat loadImage(const std::string& imagePath);
 
-	void handleInvalidArgument(const char* message);
+	void handleInvalidArgument(const char* message);	
 
 	ImageProcessor m_imageProcessor;
 
