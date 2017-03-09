@@ -64,6 +64,8 @@ void Logger::TryInitialize()
 {
 	if (!s_initialized)
 	{
+		s_initialized = true;
+
 		Initialize();
 	}
 }
