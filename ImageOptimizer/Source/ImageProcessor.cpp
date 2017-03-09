@@ -83,7 +83,7 @@ void ImageProcessor::logDurationAndResults(long long duration, const Optimizatio
 {
 	std::ostringstream message;
 
-	message << duration << "ms - " << results.NumberOfIterations() << " iterations" << std::endl;
+	message << duration << "ms - " << results.NumberOfIterations() << " iterations - Best quality: " << results.BestQuality() << std::endl;
 
 	message.precision(std::numeric_limits<float>::max_digits10);
 
