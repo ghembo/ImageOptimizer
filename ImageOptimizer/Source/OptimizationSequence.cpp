@@ -4,7 +4,7 @@
 
 
 
-void OptimizationSequence::AddOptimizationResult(unsigned int quality, float ssim)
+void OptimizationSequence::AddOptimizationResult(unsigned int quality, ImageSimilarity::Similarity ssim)
 {
 	m_optimizationResults.push_back(std::make_pair(quality, ssim));
 }

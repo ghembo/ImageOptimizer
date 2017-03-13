@@ -1,6 +1,8 @@
 #ifndef OptimizationSequence_h__
 #define OptimizationSequence_h__
 
+#include "ImageSimilarity.h"
+
 #include <vector>
 #include <utility>
 
@@ -9,10 +11,10 @@
 class OptimizationSequence
 {
 private:
-	using sequence_t = std::vector<std::pair<unsigned int, float>>;
+	using sequence_t = std::vector<std::pair<unsigned int, ImageSimilarity::Similarity>>;
 
 public:
-	void AddOptimizationResult(unsigned int quality, float ssim);
+	void AddOptimizationResult(unsigned int quality, ImageSimilarity::Similarity ssim);
 
 	unsigned int BestQuality() const;
 	unsigned int NumberOfIterations() const;

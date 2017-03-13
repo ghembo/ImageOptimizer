@@ -20,7 +20,7 @@ ImageProcessor::ImageProcessor():
 
 unsigned int ImageProcessor::OptimizeImage(const cv::Mat& image)
 {
-	constexpr float targetSsim = 0.999f;
+	constexpr sim::Similarity targetSsim{ 0.999f };
 
 	auto start = std::chrono::steady_clock::now();
 
@@ -34,7 +34,7 @@ unsigned int ImageProcessor::OptimizeImage(const cv::Mat& image)
 	return qualities.BestQuality();
 }
 
-OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, float targetSsim)
+OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim)
 {
 	unsigned int minQuality = 0;
 	unsigned int maxQuality = 100;
@@ -57,7 +57,7 @@ OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, flo
 	return qualities;
 }
 
-float ImageProcessor::computeSsim(const cv::Mat& image, unsigned int quality)
+ImageSimilarity::Similarity ImageProcessor::computeSsim(const cv::Mat& image, unsigned int quality)
 {
 	std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(image, quality);
 
@@ -69,7 +69,7 @@ float ImageProcessor::computeSsim(const cv::Mat& image, unsigned int quality)
 	return ImageSimilarity::ComputeSsim(image, compressedImage);
 }
 
-std::pair<unsigned int, unsigned int> ImageProcessor::getNextQualityRange(unsigned int quality, float currentSsim, float targetSsim, unsigned  int minQuality, unsigned  int maxQuality)
+std::pair<unsigned int, unsigned int> ImageProcessor::getNextQualityRange(unsigned int quality, sim::Similarity currentSsim, sim::Similarity targetSsim, unsigned  int minQuality, unsigned  int maxQuality)
 {
 	return (currentSsim > targetSsim) ? std::make_pair(minQuality, quality) : std::make_pair(quality, maxQuality);
 }
@@ -83,9 +83,7 @@ void ImageProcessor::logDurationAndResults(long long duration, const Optimizatio
 {
 	std::ostringstream message;
 
-	message << duration << "ms - " << results.NumberOfIterations() << " iterations - Best quality: " << results.BestQuality() << std::endl;
-
-	message.precision(std::numeric_limits<float>::max_digits10);
+	message << duration << "ms - " << results.NumberOfIterations() << " iterations - Best quality: " << results.BestQuality() << std::endl;	
 
 	for (auto result : results)
 	{

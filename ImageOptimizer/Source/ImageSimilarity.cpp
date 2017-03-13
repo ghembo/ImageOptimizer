@@ -9,6 +9,22 @@
 
 namespace ImageSimilarity
 {
+	// Formatting logic for ImageSimilarity
+	std::ostream& operator<< (std::ostream& stream, Similarity similarity)
+	{
+		auto originalPrecision = stream.precision();
+
+		stream.precision(std::numeric_limits<float>::max_digits10);
+
+		stream << similarity.GetValue();
+
+		stream.precision(originalPrecision);
+
+		return stream;
+	}
+
+
+
 	#define SQUARE_LEN 8
 
 	std::pair<int, int> convolve(float *img, int width, int height, float *result)
@@ -177,7 +193,7 @@ namespace ImageSimilarity
 	}
 
 	// TODO usare int
-	float ComputeSsim(const cv::Mat& referenceImage, const cv::Mat& compareImage)
+	Similarity ComputeSsim(const cv::Mat& referenceImage, const cv::Mat& compareImage)
 	{
 		if (!referenceImage.isContinuous() || !compareImage.isContinuous())
 		{
@@ -205,6 +221,6 @@ namespace ImageSimilarity
 			std::tie(width, height) = decimate(compareFloat.get(), width, height, scale);
 		}
 		
-		return ssim(referenceFloat.get(), compareFloat.get(), width, height);
+		return{ ssim(referenceFloat.get(), compareFloat.get(), width, height) };
 	}
 }
