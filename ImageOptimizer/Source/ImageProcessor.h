@@ -21,6 +21,7 @@ private:
 	float computeSsim(const cv::Mat& image, unsigned int quality);
 
 	unsigned int getNextQuality(unsigned int minQuality, unsigned int maxQuality);
+	std::pair<unsigned int, unsigned int> getNextQualityRange(unsigned int quality, float currentSsim, float targetSsim, unsigned  int minQuality, unsigned  int maxQuality);
 
 	void logDurationAndResults(long long duration, const OptimizationSequence& results);
 
