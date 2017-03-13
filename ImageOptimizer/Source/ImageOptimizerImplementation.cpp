@@ -35,16 +35,13 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 {
 	m_logger.Log(imageFolderPath.data());
 
-	path p(imageFolderPath);
+	validateFolderPath(imageFolderPath);
 
-	if (!exists(p))
-	{
-		handleInvalidArgument("Folder doesn't exist");
-	}
+	auto filenames = getJpegInFolder(imageFolderPath);
 
-	if (!is_directory(p))
+	for (const auto& filename : filenames)
 	{
-		handleInvalidArgument("Path is not a folder");
+		OptimizeImage(filename);
 	}
 
 	auto filenames = getJpegInFolder(imageFolderPath);
@@ -82,6 +79,28 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
 
 cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
 {
+	validateImagePath(imagePath);
+
+	return JpegEncoderDecoder::LoadGrayscaleImage(imagePath);
+}
+
+void ImageOptimizerImplementation::validateFolderPath(const std::string& imageFolderPath)
+{
+	path p(imageFolderPath);
+
+	if (!exists(p))
+	{
+		handleInvalidArgument("Folder doesn't exist");
+	}
+
+	if (!is_directory(p))
+	{
+		handleInvalidArgument("Path is not a folder");
+	}
+}
+
+void ImageOptimizerImplementation::validateImagePath(const std::string& imagePath)
+{
 	path p(imagePath);
 
 	if (!exists(p))
@@ -93,8 +112,6 @@ cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
 	{
 		handleInvalidArgument("Path is not a file");
 	}
-
-	return JpegEncoderDecoder::LoadGrayscaleImage(imagePath);
 }
 
 void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
