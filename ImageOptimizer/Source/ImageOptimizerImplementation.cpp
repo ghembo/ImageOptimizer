@@ -75,15 +75,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
 
 	auto image = loadImage(imagePath);
 
-	if (image.data == NULL)
-	{
-		handleInvalidArgument("Image format not supported");
-	}
-
-	if (!image.isContinuous())
-	{
-		handleInvalidArgument("Cannot efficiently process input image");
-	}	
+	validateImage(image);
 	
 	auto bestQuality = m_imageProcessor.OptimizeImage(image);
 
@@ -128,6 +120,19 @@ void ImageOptimizerImplementation::validateImagePath(const std::string& imagePat
 	if (!is_regular_file(p))
 	{
 		handleInvalidArgument("Path is not a file");
+	}
+}
+
+void ImageOptimizerImplementation::validateImage(const cv::Mat& image)
+{
+	if (image.data == NULL)
+	{
+		handleInvalidArgument("Image format not supported");
+	}
+
+	if (!image.isContinuous())
+	{
+		handleInvalidArgument("Cannot efficiently process input image");
 	}
 }
 

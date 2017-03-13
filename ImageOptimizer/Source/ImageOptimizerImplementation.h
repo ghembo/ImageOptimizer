@@ -41,6 +41,7 @@ private:
 
 	void validateFolderPath(const std::string& imageFolderPath);
 	void validateImagePath(const std::string& imagePath);
+	void validateImage(const cv::Mat& image);
 	void handleInvalidArgument(const char* message);	
 
 	ImageProcessor m_imageProcessor;
