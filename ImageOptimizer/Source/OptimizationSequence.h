@@ -2,6 +2,7 @@
 #define OptimizationSequence_h__
 
 #include "ImageSimilarity.h"
+#include "Quality.h"
 
 #include <vector>
 #include <utility>
@@ -11,14 +12,14 @@
 class OptimizationSequence
 {
 private:
-	using sequence_t = std::vector<std::pair<unsigned int, ImageSimilarity::Similarity>>;
+	using sequence_t = std::vector<std::pair<Quality, ImageSimilarity::Similarity>>;
 
 public:
-	void AddOptimizationResult(unsigned int quality, ImageSimilarity::Similarity ssim);
+	void AddOptimizationResult(Quality quality, ImageSimilarity::Similarity ssim);
 
-	unsigned int BestQuality() const;
+	Quality BestQuality() const;
 	unsigned int NumberOfIterations() const;
-	bool HasBeenTried(unsigned int quality) const;
+	bool HasBeenTried(Quality quality) const;
 
 	using iterator = sequence_t::iterator;
 	using const_iterator = sequence_t::const_iterator;
