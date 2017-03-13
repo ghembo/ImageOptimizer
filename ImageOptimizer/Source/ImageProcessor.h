@@ -2,6 +2,7 @@
 #define ImageProcessor_h__
 
 #include "Logger.h"
+#include "Quality.h"
 
 namespace cv
 {
@@ -20,8 +21,6 @@ class OptimizationSequence;
 class  ImageProcessor
 {
 public:
-	using Quality = unsigned int;
-
 	ImageProcessor();
 	Quality OptimizeImage(const cv::Mat& image);
 	
@@ -29,8 +28,8 @@ private:
 	static OptimizationSequence searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim);
 	static sim::Similarity computeSsim(const cv::Mat& image, Quality quality);
 
-	static Quality getNextQuality(Quality minQuality, Quality maxQuality);
-	static std::pair<Quality, Quality> getNextQualityRange(Quality quality, sim::Similarity currentSsim, sim::Similarity targetSsim, Quality minQuality, Quality maxQuality);
+	static Quality getNextQuality(QualityRange qualityRange);
+	static QualityRange getNextQualityRange(Quality quality, sim::Similarity currentSsim, sim::Similarity targetSsim, QualityRange currentRange);
 
 	void logDurationAndResults(long long duration, const OptimizationSequence& results);
 

@@ -65,6 +65,9 @@
     <ClInclude Include="Source\ImageProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Quality.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

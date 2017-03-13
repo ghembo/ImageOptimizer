@@ -18,7 +18,7 @@ ImageProcessor::ImageProcessor():
 {
 }
 
-ImageProcessor::Quality ImageProcessor::OptimizeImage(const cv::Mat& image)
+Quality ImageProcessor::OptimizeImage(const cv::Mat& image)
 {
 	constexpr sim::Similarity targetSsim{ 0.999f };
 
@@ -36,12 +36,11 @@ ImageProcessor::Quality ImageProcessor::OptimizeImage(const cv::Mat& image)
 
 OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim)
 {
-	Quality minQuality = 0;
-	Quality maxQuality = 100;
+	QualityRange qualityRange{ 0, 100 };
 
 	OptimizationSequence qualities;
 
-	auto quality = getNextQuality(minQuality, maxQuality);
+	auto quality = getNextQuality(qualityRange);
 
 	while (!qualities.HasBeenTried(quality))
 	{
@@ -49,9 +48,9 @@ OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim
 
 		qualities.AddOptimizationResult(quality, ssim);
 
-		std::tie(minQuality, maxQuality) = getNextQualityRange(quality, ssim, targetSsim, minQuality, maxQuality);
+		qualityRange = getNextQualityRange(quality, ssim, targetSsim, qualityRange);
 
-		quality = getNextQuality(minQuality, maxQuality);
+		quality = getNextQuality(qualityRange);
 	}
 
 	return qualities;
@@ -69,14 +68,14 @@ ImageSimilarity::Similarity ImageProcessor::computeSsim(const cv::Mat& image, Qu
 	return ImageSimilarity::ComputeSsim(image, compressedImage);
 }
 
-std::pair<ImageProcessor::Quality, ImageProcessor::Quality> ImageProcessor::getNextQualityRange(Quality quality, sim::Similarity currentSsim, sim::Similarity targetSsim, Quality minQuality, Quality maxQuality)
+Quality ImageProcessor::getNextQuality(QualityRange qualityRange)
 {
-	return (currentSsim > targetSsim) ? std::make_pair(minQuality, quality) : std::make_pair(quality, maxQuality);
+	return (qualityRange.GetMinimum() + qualityRange.GetMaximum()) / 2;
 }
 
-ImageProcessor::Quality ImageProcessor::getNextQuality(Quality minQuality, Quality maxQuality)
+QualityRange ImageProcessor::getNextQualityRange(Quality quality, sim::Similarity currentSsim, sim::Similarity targetSsim, QualityRange qualityRange)
 {
-	return (minQuality + maxQuality) / 2;
+	return (currentSsim > targetSsim) ? QualityRange{ qualityRange.GetMinimum(), quality } : QualityRange{ quality, qualityRange.GetMaximum() };
 }
 
 void ImageProcessor::logDurationAndResults(long long duration, const OptimizationSequence& results)

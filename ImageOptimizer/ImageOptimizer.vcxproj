@@ -117,6 +117,7 @@
     <ClInclude Include="Source\JpegEncoderDecoder.h" />
     <ClInclude Include="Source\Logger.h" />
     <ClInclude Include="Source\OptimizationSequence.h" />
+    <ClInclude Include="Source\Quality.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
