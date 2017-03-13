@@ -114,6 +114,11 @@ std::string ImageOptimizerImplementation::getNewFilename(const std::string& file
 
 bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 {
+	if (is_regular_file(file))
+	{
+		return false;
+	}
+
 	const std::regex jpegExtension(R"(^\.jpe?g$)", std::regex_constants::icase);
 
 	return std::regex_match(file.path().extension().string(), jpegExtension);
