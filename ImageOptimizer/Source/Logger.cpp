@@ -50,16 +50,6 @@ Logger::Logger( const char* channel ) :
 	TryInitialize();
 }
 
-void Logger::Log( const char* message )
-{
-	BOOST_LOG(m_logger) << message;
-}
-
-void Logger::Log( SeverityLevel severity, const char* message )
-{
-	BOOST_LOG_SEV(m_logger, severity) << message;
-}
-
 void Logger::TryInitialize()
 {
 	if (!s_initialized)
