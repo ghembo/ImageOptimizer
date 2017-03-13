@@ -20,9 +20,9 @@ public:
 
 	static std::string GetVersion();
 
-	void OptimizeImage(const std::string& imagePath);
-	void OptimizeFolder(const std::string& folderPath);
-	void OptimizeFolderRecursive(const std::string& imageFolderPath);
+	void OptimizeImage(const std::string& imagePath, float similarity = 0.999);
+	void OptimizeFolder(const std::string& folderPath, float similarity = 0.999);
+	void OptimizeFolderRecursive(const std::string& imageFolderPath, float similarity = 0.999);
 
 private:
 	std::unique_ptr<ImageOptimizerImplementation> m_implementation;

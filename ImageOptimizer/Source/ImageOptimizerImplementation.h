@@ -3,6 +3,7 @@
 
 #include "Logger.h"
 #include "ImageProcessor.h"
+#include "ImageSimilarity.h"
 
 #include <string>
 
@@ -26,9 +27,9 @@ class  ImageOptimizerImplementation
 public:
 	ImageOptimizerImplementation();
 
-	void OptimizeImage(const std::string& imagePath);
-	void OptimizeFolder(const std::string& imageFolderPath);
-	void OptimizeFolderRecursive(const std::string& imageFolderPath);
+	void OptimizeImage(const std::string& imagePath, ImageSimilarity::Similarity similarity);
+	void OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
+	void OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	
 private:
 	static std::string getNewFilename(const std::string& filename);

@@ -18,13 +18,11 @@ ImageProcessor::ImageProcessor():
 {
 }
 
-Quality ImageProcessor::OptimizeImage(const cv::Mat& image)
+Quality ImageProcessor::OptimizeImage(const cv::Mat& image, sim::Similarity targetSimilarity)
 {
-	constexpr sim::Similarity targetSsim{ 0.999f };
-
 	auto start = std::chrono::steady_clock::now();
 
-	auto qualities = searchBestQuality(image, targetSsim);
+	auto qualities = searchBestQuality(image, targetSimilarity);
 
 	auto finish = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();

@@ -41,7 +41,7 @@ auto ImageOptimizerImplementation::getAllFoldersInFolder(const std::string& fold
 	return folders;
 }
 
-void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath)
+void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
 	m_logger.Log(imageFolderPath.data());
 
@@ -51,25 +51,25 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 
 	for (const auto& filename : filenames)
 	{
-		OptimizeImage(filename);
+		OptimizeImage(filename, similarity);
 	}
 }
 
-void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath)
+void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
 	m_logger.Log(imageFolderPath.data());
 
-	OptimizeFolder(imageFolderPath);
+	OptimizeFolder(imageFolderPath, similarity);
 
 	auto folders = getAllFoldersInFolder(imageFolderPath);
 
 	for (const auto& folder : folders)
 	{
-		OptimizeFolder(folder);
+		OptimizeFolder(folder, similarity);
 	}
 }
 
-void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
+void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
 {
  	m_logger.Log(imagePath.data());
 
@@ -77,7 +77,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath )
 
 	validateImage(image);
 	
-	auto bestQuality = m_imageProcessor.OptimizeImage(image);
+	auto bestQuality = m_imageProcessor.OptimizeImage(image, similarity);
 
 	image.release();
 

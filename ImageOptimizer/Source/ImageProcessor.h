@@ -22,7 +22,7 @@ class  ImageProcessor
 {
 public:
 	ImageProcessor();
-	Quality OptimizeImage(const cv::Mat& image);
+	Quality OptimizeImage(const cv::Mat& image, sim::Similarity targetSimilarity);
 	
 private:
 	static OptimizationSequence searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim);
