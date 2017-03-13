@@ -76,6 +76,8 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 	auto image = loadImage(imagePath);
 
 	validateImage(image);
+
+	m_logger.Log("Target ssim: " + std::to_string(similarity.GetValue()));
 	
 	auto bestQuality = m_imageProcessor.OptimizeImage(image, similarity);
 

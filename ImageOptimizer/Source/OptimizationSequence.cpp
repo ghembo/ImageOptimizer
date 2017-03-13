@@ -11,7 +11,8 @@ void OptimizationSequence::AddOptimizationResult(Quality quality, ImageSimilarit
 
 Quality OptimizationSequence::BestQuality() const
 {
-	return m_optimizationResults[m_optimizationResults.size() - 1].first;
+	return (*std::min_element(m_optimizationResults.begin(), m_optimizationResults.end(), 
+		[targetSimilarity = m_targetSimilarity](const auto& first, const auto& second) {return abs(first.second - targetSimilarity) < abs(second.second - targetSimilarity); })).first;
 }
 
 unsigned int OptimizationSequence::NumberOfIterations() const

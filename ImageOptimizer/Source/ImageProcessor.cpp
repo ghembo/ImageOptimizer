@@ -36,7 +36,7 @@ OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim
 {
 	QualityRange qualityRange{ 0, 100 };
 
-	OptimizationSequence qualities;
+	OptimizationSequence qualities{ targetSsim };
 
 	auto quality = getNextQuality(qualityRange);
 

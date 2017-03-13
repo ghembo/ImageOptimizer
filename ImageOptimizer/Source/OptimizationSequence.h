@@ -15,6 +15,10 @@ private:
 	using sequence_t = std::vector<std::pair<Quality, ImageSimilarity::Similarity>>;
 
 public:
+	OptimizationSequence(ImageSimilarity::Similarity targetSimilarity) : m_targetSimilarity{ targetSimilarity }
+	{
+	}
+
 	void AddOptimizationResult(Quality quality, ImageSimilarity::Similarity ssim);
 
 	Quality BestQuality() const;
@@ -31,6 +35,7 @@ public:
 
 private:
 	sequence_t m_optimizationResults;
+	ImageSimilarity::Similarity m_targetSimilarity;
 };
 
 #endif // !OptimizationSequence_h__
