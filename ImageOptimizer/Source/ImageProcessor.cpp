@@ -18,7 +18,7 @@ ImageProcessor::ImageProcessor():
 {
 }
 
-unsigned int ImageProcessor::OptimizeImage(const cv::Mat& image)
+ImageProcessor::Quality ImageProcessor::OptimizeImage(const cv::Mat& image)
 {
 	constexpr sim::Similarity targetSsim{ 0.999f };
 
@@ -36,8 +36,8 @@ unsigned int ImageProcessor::OptimizeImage(const cv::Mat& image)
 
 OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim)
 {
-	unsigned int minQuality = 0;
-	unsigned int maxQuality = 100;
+	Quality minQuality = 0;
+	Quality maxQuality = 100;
 
 	OptimizationSequence qualities;
 
@@ -57,7 +57,7 @@ OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim
 	return qualities;
 }
 
-ImageSimilarity::Similarity ImageProcessor::computeSsim(const cv::Mat& image, unsigned int quality)
+ImageSimilarity::Similarity ImageProcessor::computeSsim(const cv::Mat& image, Quality quality)
 {
 	std::vector<uchar> buffer = JpegEncoderDecoder::MemoryEncodeJpeg(image, quality);
 
@@ -69,12 +69,12 @@ ImageSimilarity::Similarity ImageProcessor::computeSsim(const cv::Mat& image, un
 	return ImageSimilarity::ComputeSsim(image, compressedImage);
 }
 
-std::pair<unsigned int, unsigned int> ImageProcessor::getNextQualityRange(unsigned int quality, sim::Similarity currentSsim, sim::Similarity targetSsim, unsigned  int minQuality, unsigned  int maxQuality)
+std::pair<ImageProcessor::Quality, ImageProcessor::Quality> ImageProcessor::getNextQualityRange(Quality quality, sim::Similarity currentSsim, sim::Similarity targetSsim, Quality minQuality, Quality maxQuality)
 {
 	return (currentSsim > targetSsim) ? std::make_pair(minQuality, quality) : std::make_pair(quality, maxQuality);
 }
 
-unsigned int ImageProcessor::getNextQuality(unsigned int minQuality, unsigned int maxQuality)
+ImageProcessor::Quality ImageProcessor::getNextQuality(Quality minQuality, Quality maxQuality)
 {
 	return (minQuality + maxQuality) / 2;
 }

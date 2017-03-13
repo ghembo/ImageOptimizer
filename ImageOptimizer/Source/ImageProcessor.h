@@ -20,15 +20,17 @@ class OptimizationSequence;
 class  ImageProcessor
 {
 public:
+	using Quality = unsigned int;
+
 	ImageProcessor();
-	unsigned int OptimizeImage(const cv::Mat& image);
+	Quality OptimizeImage(const cv::Mat& image);
 	
 private:
 	static OptimizationSequence searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim);
-	static sim::Similarity computeSsim(const cv::Mat& image, unsigned int quality);
+	static sim::Similarity computeSsim(const cv::Mat& image, Quality quality);
 
-	static unsigned int getNextQuality(unsigned int minQuality, unsigned int maxQuality);
-	static std::pair<unsigned int, unsigned int> getNextQualityRange(unsigned int quality, sim::Similarity currentSsim, sim::Similarity targetSsim, unsigned  int minQuality, unsigned  int maxQuality);
+	static Quality getNextQuality(Quality minQuality, Quality maxQuality);
+	static std::pair<Quality, Quality> getNextQualityRange(Quality quality, sim::Similarity currentSsim, sim::Similarity targetSsim, Quality minQuality, Quality maxQuality);
 
 	void logDurationAndResults(long long duration, const OptimizationSequence& results);
 
