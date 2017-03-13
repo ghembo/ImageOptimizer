@@ -31,6 +31,16 @@ auto ImageOptimizerImplementation::getJpegInFolder(const std::string& imageFolde
 	return filenames;
 }
 
+auto ImageOptimizerImplementation::getAllFoldersInFolder(const std::string& folderPath)
+{
+	std::vector<std::string> folders;
+
+	boost::transform(boost::make_iterator_range(recursive_directory_iterator(path(folderPath)), {}) | boost::adaptors::filtered([](const auto& entry) {return is_directory(entry); }),
+		back_inserter(folders), [](const auto& file) {return file.path().string(); });
+
+	return folders;
+}
+
 void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath)
 {
 	m_logger.Log(imageFolderPath.data());
@@ -43,12 +53,19 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 	{
 		OptimizeImage(filename);
 	}
+}
 
-	auto filenames = getJpegInFolder(imageFolderPath);
+void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath)
+{
+	m_logger.Log(imageFolderPath.data());
 
-	for (const auto& filename : filenames)
+	OptimizeFolder(imageFolderPath);
+
+	auto folders = getAllFoldersInFolder(imageFolderPath);
+
+	for (const auto& folder : folders)
 	{
-		OptimizeImage(filename);
+		OptimizeFolder(folder);
 	}
 }
 

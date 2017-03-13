@@ -32,6 +32,11 @@ void ImageOptimizer::OptimizeFolder(const std::string& folderPath)
 	m_implementation->OptimizeFolder(folderPath);
 }
 
+void ImageOptimizer::OptimizeFolderRecursive(const std::string& folderPath)
+{
+	m_implementation->OptimizeFolderRecursive(folderPath);
+}
+
 void ImageOptimizer::EnableFileLogging( SeverityLevel minimumSeverity /*= trace*/, const std::string& component /*= ""*/ )
 {
 	Logger::EnableFileLogging(minimumSeverity, component);

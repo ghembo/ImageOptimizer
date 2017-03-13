@@ -22,6 +22,7 @@ public:
 
 	void OptimizeImage(const std::string& imagePath);
 	void OptimizeFolder(const std::string& folderPath);
+	void OptimizeFolderRecursive(const std::string& imageFolderPath);
 
 private:
 	std::unique_ptr<ImageOptimizerImplementation> m_implementation;
