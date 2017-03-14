@@ -88,9 +88,12 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
-	logFileSizesAndCompression(imagePath, temporaryFilename);
+	auto originalFileSize = getFileSize(imagePath);
+	auto newFileSize = getFileSize(temporaryFilename);
 
-	if (getFileSize(temporaryFilename) >= getFileSize(imagePath))
+	logFileSizesAndCompression(originalFileSize, newFileSize);
+
+	if (newFileSize >= originalFileSize)
 	{
 		remove(temporaryFilename);
 
@@ -169,9 +172,7 @@ std::string ImageOptimizerImplementation::addSuffixToFileName(const std::string&
 
 std::string ImageOptimizerImplementation::getTemporaryFilename(const std::string& filename)
 {
-	unsigned long long counter = 0;
-
-	while (true)
+	for (unsigned long long counter = 0; ; counter++)
 	{
 		auto temporaryFileName = addSuffixToFileName(filename, "_tmp" + std::to_string(counter));
 
@@ -182,12 +183,12 @@ std::string ImageOptimizerImplementation::getTemporaryFilename(const std::string
 	}
 }
 
-unsigned long long ImageOptimizerImplementation::getFileSize(const std::string& fileName)
+ImageOptimizerImplementation::filesize_t ImageOptimizerImplementation::getFileSize(const std::string& fileName)
 {
 	return file_size(fileName);
 }
 
-unsigned int ImageOptimizerImplementation::computeCompression(unsigned long long originalSize, unsigned long long newSize)
+unsigned int ImageOptimizerImplementation::computeCompression(filesize_t originalSize, filesize_t newSize)
 {
 	return static_cast<int>((newSize * 100) / originalSize);
 }
@@ -204,11 +205,8 @@ bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 	return std::regex_match(file.path().extension().string(), jpegExtension);
 }
 
-void ImageOptimizerImplementation::logFileSizesAndCompression(const std::string& originalFileName, const std::string& newFileName)
+void ImageOptimizerImplementation::logFileSizesAndCompression(filesize_t originalFileSize, filesize_t newFileSize)
 {
-	auto originalFileSize = getFileSize(originalFileName);
-	auto newFileSize = getFileSize(newFileName);
-
 	auto compression = computeCompression(originalFileSize, newFileSize);
 
 	m_logger.Log("Original size: " + std::to_string(originalFileSize) + " New size: " + std::to_string(newFileSize) + " Compression: " + std::to_string(compression) + "%");

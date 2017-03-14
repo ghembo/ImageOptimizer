@@ -32,10 +32,12 @@ public:
 	void OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	
 private:
+	using filesize_t = unsigned long long;
+
 	static std::string addSuffixToFileName(const std::string& filename, const std::string& suffix);
 
-	static unsigned long long getFileSize(const std::string& fileName);
-	static unsigned int computeCompression(unsigned long long originalSize, unsigned long long newSize);
+	static filesize_t getFileSize(const std::string& fileName);
+	static unsigned int computeCompression(filesize_t originalSize, filesize_t newSize);
 
 	static bool isJpegFile(const boost::filesystem::directory_entry& file);
 	static auto getJpegInFolder(const std::string& imageFolderPath);
@@ -48,7 +50,7 @@ private:
 	void validateImagePath(const std::string& imagePath);
 	void validateImage(const cv::Mat& image);
 	void handleInvalidArgument(const char* message);
-	void logFileSizesAndCompression(const std::string& originalFileName, const std::string& newFileName);
+	void logFileSizesAndCompression(filesize_t originalFileSize, filesize_t newFileSize);
 
 	ImageProcessor m_imageProcessor;
 
