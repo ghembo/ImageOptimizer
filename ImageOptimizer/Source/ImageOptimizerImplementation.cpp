@@ -57,8 +57,6 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 
 void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
-	m_logger.Log(imageFolderPath.data());
-
 	OptimizeFolder(imageFolderPath, similarity);
 
 	auto folders = getAllFoldersInFolder(imageFolderPath);
@@ -169,7 +167,7 @@ unsigned int ImageOptimizerImplementation::computeCompression(unsigned long long
 
 bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 {
-	if (is_regular_file(file))
+	if (!is_regular_file(file))
 	{
 		return false;
 	}
