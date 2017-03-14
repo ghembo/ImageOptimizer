@@ -84,10 +84,22 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 	image = JpegEncoderDecoder::LoadColorImage(imagePath);
 
 	auto newFileName(getNewFilename(imagePath));
+	auto temporaryFilename(getTemporaryFilename(newFileName));
 
-	JpegEncoderDecoder::SaveJpeg(image, newFileName, bestQuality);
+	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
-	logFileSizesAndCompression(imagePath, newFileName);
+	logFileSizesAndCompression(imagePath, temporaryFilename);
+
+	if (getFileSize(temporaryFilename) >= getFileSize(imagePath))
+	{
+		remove(temporaryFilename);
+
+		m_logger.Log("Couldn't compress more");
+	}
+	else
+	{
+		rename(temporaryFilename, newFileName);
+	}
 }
 
 cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
@@ -155,9 +167,26 @@ std::string ImageOptimizerImplementation::getNewFilename(const std::string& file
 	return newFilename.string();
 }
 
+std::string ImageOptimizerImplementation::getTemporaryFilename(const std::string& filename)
+{
+	unsigned long long counter = 0;
+
+	while (true)
+	{
+		path p(filename);
+
+		auto temporaryFileName = (p.parent_path() / path(p.stem().string() + "_tmp" + std::to_string(counter) + p.extension().string())).string();
+
+		if (!exists(temporaryFileName))
+		{
+			return temporaryFileName;
+		}
+	}
+}
+
 unsigned long long ImageOptimizerImplementation::getFileSize(const std::string& fileName)
 {
-	return file_size(path(fileName));
+	return file_size(fileName);
 }
 
 unsigned int ImageOptimizerImplementation::computeCompression(unsigned long long originalSize, unsigned long long newSize)

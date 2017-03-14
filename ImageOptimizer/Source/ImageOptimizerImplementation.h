@@ -40,6 +40,7 @@ private:
 	static bool isJpegFile(const boost::filesystem::directory_entry& file);
 	static auto getJpegInFolder(const std::string& imageFolderPath);
 	static auto getAllFoldersInFolder(const std::string& folderPath);
+	static std::string getTemporaryFilename(const std::string& filename);
 
 	cv::Mat loadImage(const std::string& imagePath);
 
