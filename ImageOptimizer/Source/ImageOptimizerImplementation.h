@@ -44,6 +44,8 @@ private:
 	static auto getAllFoldersInFolder(const std::string& folderPath);
 	static std::string getTemporaryFilename(const std::string& filename);
 
+	void optimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity);
+
 	cv::Mat loadImage(const std::string& imagePath);
 
 	void validateFolderPath(const std::string& imageFolderPath);
