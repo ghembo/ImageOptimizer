@@ -34,6 +34,9 @@ public:
 private:
 	static std::string getNewFilename(const std::string& filename);
 
+	static unsigned long long getFileSize(const std::string& fileName);
+	static unsigned int computeCompression(unsigned long long originalSize, unsigned long long newSize);
+
 	static bool isJpegFile(const boost::filesystem::directory_entry& file);
 	static auto getJpegInFolder(const std::string& imageFolderPath);
 	static auto getAllFoldersInFolder(const std::string& folderPath);
@@ -43,7 +46,8 @@ private:
 	void validateFolderPath(const std::string& imageFolderPath);
 	void validateImagePath(const std::string& imagePath);
 	void validateImage(const cv::Mat& image);
-	void handleInvalidArgument(const char* message);	
+	void handleInvalidArgument(const char* message);
+	void logFileSizesAndCompression(const std::string& originalFileName, const std::string& newFileName);
 
 	ImageProcessor m_imageProcessor;
 

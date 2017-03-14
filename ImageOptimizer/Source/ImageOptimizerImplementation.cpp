@@ -89,12 +89,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	JpegEncoderDecoder::SaveJpeg(image, newFileName, bestQuality);
 
-	auto originalFileSize = file_size(path(imagePath));
-	auto newFileSize = file_size(path(newFileName));
-
-	auto compression = (newFileSize * 100) / originalFileSize;
-
-	m_logger.Log("Original size: " + std::to_string(originalFileSize) + " New size: " + std::to_string(newFileSize) + " Compression: " + std::to_string(compression) + "%");
+	logFileSizesAndCompression(imagePath, newFileName);
 }
 
 cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
@@ -162,6 +157,16 @@ std::string ImageOptimizerImplementation::getNewFilename(const std::string& file
 	return newFilename.string();
 }
 
+unsigned long long ImageOptimizerImplementation::getFileSize(const std::string& fileName)
+{
+	return file_size(path(fileName));
+}
+
+unsigned int ImageOptimizerImplementation::computeCompression(unsigned long long originalSize, unsigned long long newSize)
+{
+	return static_cast<int>((newSize * 100) / originalSize);
+}
+
 bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 {
 	if (is_regular_file(file))
@@ -172,4 +177,14 @@ bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 	const std::regex jpegExtension(R"(^\.jpe?g$)", std::regex_constants::icase);
 
 	return std::regex_match(file.path().extension().string(), jpegExtension);
+}
+
+void ImageOptimizerImplementation::logFileSizesAndCompression(const std::string& originalFileName, const std::string& newFileName)
+{
+	auto originalFileSize = getFileSize(originalFileName);
+	auto newFileSize = getFileSize(newFileName);
+
+	auto compression = computeCompression(originalFileSize, newFileSize);
+
+	m_logger.Log("Original size: " + std::to_string(originalFileSize) + " New size: " + std::to_string(newFileSize) + " Compression: " + std::to_string(compression) + "%");
 }
