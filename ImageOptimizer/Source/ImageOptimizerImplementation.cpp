@@ -83,7 +83,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	image = JpegEncoderDecoder::LoadColorImage(imagePath);
 
-	auto newFileName(getNewFilename(imagePath));
+	auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
 	auto temporaryFilename(getTemporaryFilename(newFileName));
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
@@ -158,11 +158,11 @@ void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
 	throw std::invalid_argument(message);
 }
 
-std::string ImageOptimizerImplementation::getNewFilename(const std::string& filename)
+std::string ImageOptimizerImplementation::addSuffixToFileName(const std::string& filename, const std::string& suffix)
 {
 	path p(filename);
 
-	path newFilename = p.parent_path() / path(p.stem().string() + "_compressed" + p.extension().string());
+	path newFilename = p.parent_path() / path(p.stem().string() + suffix + p.extension().string());
 
 	return newFilename.string();
 }
@@ -173,9 +173,7 @@ std::string ImageOptimizerImplementation::getTemporaryFilename(const std::string
 
 	while (true)
 	{
-		path p(filename);
-
-		auto temporaryFileName = (p.parent_path() / path(p.stem().string() + "_tmp" + std::to_string(counter) + p.extension().string())).string();
+		auto temporaryFileName = addSuffixToFileName(filename, "_tmp" + std::to_string(counter));
 
 		if (!exists(temporaryFileName))
 		{

@@ -32,7 +32,7 @@ public:
 	void OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	
 private:
-	static std::string getNewFilename(const std::string& filename);
+	static std::string addSuffixToFileName(const std::string& filename, const std::string& suffix);
 
 	static unsigned long long getFileSize(const std::string& fileName);
 	static unsigned int computeCompression(unsigned long long originalSize, unsigned long long newSize);
