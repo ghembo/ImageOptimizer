@@ -94,7 +94,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	auto compression = (newFileSize * 100) / originalFileSize;
 
-	m_logger.Log("Original size: ", originalFileSize, " New size: ", newFileSize, " Compression: ", compression);
+	m_logger.Log("Original size: " + std::to_string(originalFileSize) + " New size: " + std::to_string(newFileSize) + " Compression: " + std::to_string(compression) + "%");
 }
 
 cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)

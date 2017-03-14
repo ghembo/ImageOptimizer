@@ -20,9 +20,7 @@ public:
 	Logger(const char* channel);
 
 	template<typename T> void Log(const T& message) { BOOST_LOG(m_logger) << message; };
-	template<typename First, typename... Rest> void Log(const First& first, const Rest&... rest) { Log(first); Log(rest...); };
-	template<typename T> void Log(SeverityLevel severity, const T& message) { BOOST_LOG_SEV(m_logger, severity) << message...; };
-	template<typename First, typename... Rest> void Log(SeverityLevel severity, const First& first, const Rest&... rest) { Log(severity, first); Log(severity, rest...); };
+	template<typename T> void Log(SeverityLevel severity, const T& message) { BOOST_LOG_SEV(m_logger, severity) << message; };
 
 	static void EnableFileLogging(SeverityLevel minimumSeverity, const std::string& component);
 	static void DisableFileLogging();
