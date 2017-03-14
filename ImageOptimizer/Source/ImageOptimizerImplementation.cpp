@@ -85,7 +85,16 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	image = JpegEncoderDecoder::LoadColorImage(imagePath);
 
-	JpegEncoderDecoder::SaveJpeg(image, getNewFilename(imagePath), bestQuality);
+	auto newFileName(getNewFilename(imagePath));
+
+	JpegEncoderDecoder::SaveJpeg(image, newFileName, bestQuality);
+
+	auto originalFileSize = file_size(path(imagePath));
+	auto newFileSize = file_size(path(newFileName));
+
+	auto compression = (newFileSize * 100) / originalFileSize;
+
+	m_logger.Log("Original size: ", originalFileSize, " New size: ", newFileSize, " Compression: ", compression);
 }
 
 cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
