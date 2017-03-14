@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -47,6 +48,8 @@ int main(int argc, char* argv[])
 
 	ImageOptimizer imageOptimizer;
 
+	auto start = std::chrono::steady_clock::now();
+
 	try
 	{
 		if (fs::is_regular_file(input))
@@ -77,7 +80,10 @@ int main(int argc, char* argv[])
 		std::cout << e.what();
 	}
 
-	std::cout << "Done!";
+	auto finish = std::chrono::steady_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();
+
+	std::cout << "Done! Processing time: " << duration << "ms";
 
 	std::getchar();
 
