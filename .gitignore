@@ -31,7 +31,6 @@
 *.suo
 *.sdf
 *.opensdf
-*.user
 *.opendb
 *.db
 
