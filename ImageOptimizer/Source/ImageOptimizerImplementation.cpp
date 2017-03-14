@@ -82,9 +82,8 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 	image.release();
 
 	image = JpegEncoderDecoder::LoadColorImage(imagePath);
-
-	auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
-	auto temporaryFilename(getTemporaryFilename(newFileName));
+		
+	auto temporaryFilename(getTemporaryFilename(imagePath));
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
@@ -101,6 +100,8 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 	}
 	else
 	{
+		auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
+
 		rename(temporaryFilename, newFileName);
 	}
 }
