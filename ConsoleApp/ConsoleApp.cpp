@@ -17,11 +17,13 @@ namespace fs = boost::filesystem;
 int main(int argc, char* argv[])
 {
 	std::string input;
+	bool recursive;
 	po::options_description desc("Allowed options");
 
 	desc.add_options()
 		("help,h", "produce help message")
-		("input,i", po::value<std::string>(&input)->default_value("."), "image or folder to process");
+		("input,i", po::value<std::string>(&input)->default_value("."), "image or folder to process")
+		("recursive,r", po::bool_switch(&recursive)->default_value(false), "recursive folder processing");
 
 	po::positional_options_description p;
 	p.add("input", -1);
@@ -37,6 +39,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	constexpr float targetSimilarity = 0.9999f;
+
 	std::cout << ImageOptimizer::GetVersion() << std::endl;
 
 	ImageOptimizer::EnableFileLogging();
@@ -47,11 +51,18 @@ int main(int argc, char* argv[])
 	{
 		if (fs::is_regular_file(input))
 		{
-			imageOptimizer.OptimizeImage(input, 0.9999f);
+			imageOptimizer.OptimizeImage(input, targetSimilarity);
 		}
 		else if (fs::is_directory(input))
 		{
-			imageOptimizer.OptimizeFolderRecursive(input, 0.9999f);
+			if (recursive)
+			{
+				imageOptimizer.OptimizeFolderRecursive(input, targetSimilarity);
+			}
+			else
+			{
+				imageOptimizer.OptimizeFolder(input, targetSimilarity);
+			}
 		}
 		else
 		{
