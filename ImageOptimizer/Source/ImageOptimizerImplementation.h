@@ -33,6 +33,7 @@ public:
 	
 private:
 	using filesize_t = unsigned long long;
+	using iterator_t = std::vector<std::string>::const_iterator;
 
 	static std::string addSuffixToFileName(const std::string& filename, const std::string& suffix);
 
@@ -44,7 +45,8 @@ private:
 	static auto getAllFoldersInFolder(const std::string& folderPath);
 	static std::string getTemporaryFilename(const std::string& filename);
 
-	void optimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity);
+	void parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity);
+	void optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity);
 
 	cv::Mat loadImage(const std::string& imagePath);
 

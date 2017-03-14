@@ -50,7 +50,7 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 
 	auto filenames = getJpegInFolder(imageFolderPath);
 
-	optimizeImages(filenames, similarity);
+	parallelOptimizeImages(filenames, similarity);
 }
 
 void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
@@ -65,44 +65,38 @@ void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& im
 		filenames.insert(filenames.end(), images.begin(), images.end()); // v1.insert(v1.end(), make_move_iterator(v2.begin()), make_move_iterator(v2.end()));
 	}
 
-	optimizeImages(filenames, similarity);
+	parallelOptimizeImages(filenames, similarity);
 }
 
-void ImageOptimizerImplementation::optimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity)
+void ImageOptimizerImplementation::optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity)
 {
-	auto nthreads = std::thread::hardware_concurrency();
-	auto nfiles = filenames.size();
+	for (auto image = first; image != last; ++image)
+	{
+		OptimizeImage(*image, similarity);
+	}
+}
 
-	std::vector<std::thread> threads(nthreads);
+void ImageOptimizerImplementation::parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity)
+{
+	const auto nthreads = std::thread::hardware_concurrency();
+	const auto nfiles = filenames.size();
+	const int imagesPerThread = nfiles / nthreads;
 
-	int imagesPerThread = nfiles / nthreads;
+	std::vector<std::thread> threads(nthreads + 1);
 
 	for (size_t t = 0; t < nthreads; t++)
 	{
-		size_t first = imagesPerThread * t;
-		size_t last = imagesPerThread * (t + 1);
+		size_t firstImage = imagesPerThread * t;
+		size_t lastImage = imagesPerThread * (t + 1);
 
-		threads[t] = std::thread([this, similarity, &filenames, first, last]()
-		{
-			for (size_t i = first; i < last; i++)
-			{
-				OptimizeImage(filenames[i], similarity);
-			}
-		});
+		threads[t] = std::thread{ [=]() {optimizeImages(filenames.cbegin() + firstImage, filenames.cbegin() + lastImage, similarity); } };
 	}
 
 	int first = imagesPerThread * nthreads;
 
-	std::thread lastThread{ [this, similarity, &filenames, first, nfiles]()
-	{
-		for (size_t i = first; i < nfiles; i++)
-		{
-			OptimizeImage(filenames[i], similarity);
-		}
-	} };
+	threads[nthreads] = std::thread{ [=]() {optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity); } };
 
 	std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
-	lastThread.join();
 }
 
 void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
