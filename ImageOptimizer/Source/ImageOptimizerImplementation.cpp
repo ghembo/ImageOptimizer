@@ -11,6 +11,7 @@
 
 #include <string>
 #include <regex>
+#include <thread>
 
 using namespace boost::filesystem;
 
@@ -49,9 +50,34 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 
 	auto filenames = getJpegInFolder(imageFolderPath);
 
-	for (const auto& filename : filenames)
+	auto nthreads = std::thread::hardware_concurrency();
+	auto nfiles = filenames.size();
+
 	{
-		OptimizeImage(filename, similarity);
+		std::vector<std::thread> threads(nthreads);
+
+		for (int t = 0; t<nthreads; t++)
+		{
+			int first = (nfiles / nthreads) * t;
+			int last = (nfiles / nthreads) * (t + 1);
+
+			threads[t] = std::thread([this, similarity, &filenames, first, last]()
+			{
+				for (size_t i = first; i < last; i++)
+				{
+					OptimizeImage(filenames[i], similarity);
+				}
+			});
+		}
+
+		std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
+	}
+
+	int first = (nfiles / nthreads) * nthreads;
+
+	for (size_t i = first; i < nfiles; i++)
+	{
+		OptimizeImage(filenames[i], similarity);
 	}
 }
 
