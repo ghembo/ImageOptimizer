@@ -34,7 +34,7 @@ Quality ImageProcessor::OptimizeImage(const cv::Mat& image, sim::Similarity targ
 
 OptimizationSequence ImageProcessor::searchBestQuality(const cv::Mat& image, sim::Similarity targetSsim)
 {
-	QualityRange qualityRange{ 0, 100 };
+	QualityRange qualityRange{ 50, 100 };
 
 	OptimizationSequence qualities{ targetSsim };
 
