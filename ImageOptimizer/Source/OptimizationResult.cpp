@@ -1,5 +1,10 @@
 #include "OptimizationResult.h"
 
+OptimizationResult::OptimizationResult()
+	: m_originalSize(0), m_compressedSize(0)
+{
+}
+
 OptimizationResult::OptimizationResult(filesize_t originalSize, filesize_t compressedSize)
 	: m_originalSize(originalSize), m_compressedSize(compressedSize)
 {
@@ -18,4 +23,12 @@ bool OptimizationResult::IsCompressed() const
 OptimizationResult OptimizationResult::GetUncompressedResult() const
 {
 	return{ m_originalSize , m_originalSize };
+}
+
+OptimizationResult& OptimizationResult::operator+=(const OptimizationResult & other)
+{
+	m_originalSize += other.GetOriginalSize();
+	m_compressedSize += other.GetCompressedSize();
+
+	return *this;
 }

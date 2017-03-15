@@ -69,12 +69,16 @@ void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& im
 	parallelOptimizeImages(filenames, similarity);
 }
 
-void ImageOptimizerImplementation::optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity)
+OptimizationResult ImageOptimizerImplementation::optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity)
 {
+	OptimizationResult result;
+
 	for (auto image = first; image != last; ++image)
 	{
-		OptimizeImage(*image, similarity);
+		result += OptimizeImage(*image, similarity);
 	}
+
+	return result;
 }
 
 void ImageOptimizerImplementation::parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity)
@@ -100,7 +104,7 @@ void ImageOptimizerImplementation::parallelOptimizeImages(const std::vector<std:
 	std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
 }
 
-void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
+OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
 {
  	m_logger.Log(imagePath.data());
 
@@ -140,6 +144,8 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 	{
 		rename(temporaryFilename, newFileName);
 	}
+
+	return result;
 }
 
 cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)

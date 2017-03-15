@@ -8,7 +8,9 @@ class OptimizationResult
 public:
 	using filesize_t = unsigned long long;
 
+	OptimizationResult();
 	OptimizationResult(filesize_t originalSize, filesize_t compressedSize);
+	OptimizationResult(const OptimizationResult& other) = default;
 
 	unsigned int GetCompressionPercentage() const;
 	filesize_t GetOriginalSize() const { return m_originalSize; };
@@ -16,6 +18,9 @@ public:
 	bool IsCompressed() const;
 
 	OptimizationResult GetUncompressedResult() const;
+
+	OptimizationResult& operator=(const OptimizationResult& other) = default;
+	OptimizationResult& operator+=(const OptimizationResult& other);
 
 private:
 

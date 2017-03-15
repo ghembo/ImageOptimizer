@@ -28,7 +28,7 @@ class  ImageOptimizerImplementation
 public:
 	ImageOptimizerImplementation();
 
-	void OptimizeImage(const std::string& imagePath, ImageSimilarity::Similarity similarity);
+	OptimizationResult OptimizeImage(const std::string& imagePath, ImageSimilarity::Similarity similarity);
 	void OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	void OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	
@@ -47,7 +47,7 @@ private:
 	static std::string getTemporaryFilename(const std::string& filename);
 
 	void parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity);
-	void optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity);
+	OptimizationResult optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity);
 
 	cv::Mat loadImage(const std::string& imagePath);
 
