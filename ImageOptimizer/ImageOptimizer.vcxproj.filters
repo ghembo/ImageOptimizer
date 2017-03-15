@@ -39,6 +39,9 @@
     <ClCompile Include="Source\ImageProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\OptimizationResult.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ImageSimilarity.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Quality.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\OptimizationResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
