@@ -133,6 +133,8 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 		m_logger.Log("Couldn't compress more");
 
 		copy_file(imagePath, newFileName);
+
+		result = result.GetUncompressedResult();
 	}
 	else
 	{

@@ -10,10 +10,12 @@ public:
 
 	OptimizationResult(filesize_t originalSize, filesize_t compressedSize);
 
-	unsigned int GetCompressionPercentage();
-	filesize_t GetOriginalSize() { return m_originalSize; };
-	filesize_t GetCompressedSize() { return m_compressedSize; };
-	bool IsCompressed();
+	unsigned int GetCompressionPercentage() const;
+	filesize_t GetOriginalSize() const { return m_originalSize; };
+	filesize_t GetCompressedSize() const { return m_compressedSize; };
+	bool IsCompressed() const;
+
+	OptimizationResult GetUncompressedResult() const;
 
 private:
 

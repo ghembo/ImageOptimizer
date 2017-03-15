@@ -5,12 +5,17 @@ OptimizationResult::OptimizationResult(filesize_t originalSize, filesize_t compr
 {
 }
 
-unsigned int OptimizationResult::GetCompressionPercentage()
+unsigned int OptimizationResult::GetCompressionPercentage() const
 {
 	return static_cast<int>((m_compressedSize * 100) / m_originalSize);
 }
 
-bool OptimizationResult::IsCompressed()
+bool OptimizationResult::IsCompressed() const
 {
 	return m_compressedSize < m_originalSize;
+}
+
+OptimizationResult OptimizationResult::GetUncompressedResult() const
+{
+	return{ m_originalSize , m_originalSize };
 }
