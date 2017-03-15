@@ -124,16 +124,18 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	logFileSizesAndCompression(originalFileSize, newFileSize);
 
+	auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
+
 	if (newFileSize >= originalFileSize)
 	{
 		remove(temporaryFilename);
 
 		m_logger.Log("Couldn't compress more");
+
+		copy_file(imagePath, newFileName);
 	}
 	else
 	{
-		auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
-
 		rename(temporaryFilename, newFileName);
 	}
 }
