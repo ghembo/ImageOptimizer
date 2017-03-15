@@ -91,7 +91,8 @@ int main(int argc, char* argv[])
 
 	std::cout << "Original size: " << result.GetOriginalSize() / MB << " MB" <<
 				" Compressed size: " << result.GetCompressedSize() / MB << " MB" <<
-				" Compression: " << result.GetCompressionPercentage() << "%" << std::endl;
+				" Compression: " << result.GetCompressionPercentage() << "%" <<
+				" Saved: " << (result.GetOriginalSize() - result.GetCompressedSize()) / MB<< "MB" << std::endl;
 
 	std::getchar();
 
