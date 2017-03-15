@@ -126,7 +126,7 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
 
-	if (result.IsCompressed())
+	if (!result.IsCompressed())
 	{
 		remove(temporaryFilename);
 
