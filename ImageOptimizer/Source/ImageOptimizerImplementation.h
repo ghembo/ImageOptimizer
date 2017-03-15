@@ -30,7 +30,7 @@ public:
 
 	OptimizationResult OptimizeImage(const std::string& imagePath, ImageSimilarity::Similarity similarity);
 	OptimizationResult OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
-	void OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
+	OptimizationResult OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	
 private:
 	using filesize_t = unsigned long long;

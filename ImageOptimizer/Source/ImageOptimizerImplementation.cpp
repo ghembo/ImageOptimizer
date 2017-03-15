@@ -54,7 +54,7 @@ OptimizationResult ImageOptimizerImplementation::OptimizeFolder(const std::strin
 	return parallelOptimizeImages(filenames, similarity);
 }
 
-void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
+OptimizationResult ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
 	std::vector<std::string> filenames{ getJpegInFolder(imageFolderPath) };
 
@@ -66,7 +66,7 @@ void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& im
 		filenames.insert(filenames.end(), images.begin(), images.end()); // v1.insert(v1.end(), make_move_iterator(v2.begin()), make_move_iterator(v2.end()));
 	}
 
-	parallelOptimizeImages(filenames, similarity);
+	return parallelOptimizeImages(filenames, similarity);
 }
 
 OptimizationResult ImageOptimizerImplementation::optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity)
