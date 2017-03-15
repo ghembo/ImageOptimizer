@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "ImageProcessor.h"
 #include "ImageSimilarity.h"
+#include "OptimizationResult.h"
 
 #include <string>
 
@@ -54,7 +55,7 @@ private:
 	void validateImagePath(const std::string& imagePath);
 	void validateImage(const cv::Mat& image);
 	void handleInvalidArgument(const char* message);
-	void logFileSizesAndCompression(filesize_t originalFileSize, filesize_t newFileSize);
+	void logFileSizesAndCompression(OptimizationResult optimizationResult);
 
 	ImageProcessor m_imageProcessor;
 

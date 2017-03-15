@@ -2,6 +2,7 @@
 
 #include "Logger.h"
 #include "JpegEncoderDecoder.h"
+#include "OptimizationResult.h"
 
 #include "opencv2\core\core.hpp"
 
@@ -119,14 +120,13 @@ void ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, 
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
-	auto originalFileSize = getFileSize(imagePath);
-	auto newFileSize = getFileSize(temporaryFilename);
+	OptimizationResult result{ getFileSize(imagePath) , getFileSize(temporaryFilename) };
 
-	logFileSizesAndCompression(originalFileSize, newFileSize);
+	logFileSizesAndCompression(result);
 
 	auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
 
-	if (newFileSize >= originalFileSize)
+	if (result.IsCompressed())
 	{
 		remove(temporaryFilename);
 
@@ -223,11 +223,6 @@ ImageOptimizerImplementation::filesize_t ImageOptimizerImplementation::getFileSi
 	return file_size(fileName);
 }
 
-unsigned int ImageOptimizerImplementation::computeCompression(filesize_t originalSize, filesize_t newSize)
-{
-	return static_cast<int>((newSize * 100) / originalSize);
-}
-
 bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 {
 	if (!is_regular_file(file))
@@ -240,9 +235,11 @@ bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 	return std::regex_match(file.path().extension().string(), jpegExtension);
 }
 
-void ImageOptimizerImplementation::logFileSizesAndCompression(filesize_t originalFileSize, filesize_t newFileSize)
+void ImageOptimizerImplementation::logFileSizesAndCompression(OptimizationResult optimizationResult)
 {
-	auto compression = computeCompression(originalFileSize, newFileSize);
+	auto compression = optimizationResult.GetCompressionPercentage();
 
-	m_logger.Log("Original size: " + std::to_string(originalFileSize) + " New size: " + std::to_string(newFileSize) + " Compression: " + std::to_string(compression) + "%");
+	m_logger.Log("Original size: " + std::to_string(optimizationResult.GetOriginalSize()) +
+				" New size: " + std::to_string(optimizationResult.GetCompressedSize()) + 
+				" Compression: " + std::to_string(compression) + "%");
 }
