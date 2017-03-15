@@ -23,19 +23,19 @@ ImageOptimizer::~ImageOptimizer()
 {	
 }
 
-void ImageOptimizer::OptimizeImage( const std::string& imagePath, float similarity /*= 0.999*/)
+OptimizationResult ImageOptimizer::OptimizeImage( const std::string& imagePath, float similarity /*= 0.999*/)
 {
-	m_implementation->OptimizeImage(imagePath, ImageSimilarity::Similarity{ similarity });
+	return m_implementation->OptimizeImage(imagePath, ImageSimilarity::Similarity{ similarity });
 }
 
-void ImageOptimizer::OptimizeFolder(const std::string& folderPath, float similarity /*= 0.999*/)
+OptimizationResult ImageOptimizer::OptimizeFolder(const std::string& folderPath, float similarity /*= 0.999*/)
 {
-	m_implementation->OptimizeFolder(folderPath, ImageSimilarity::Similarity{ similarity });
+	return m_implementation->OptimizeFolder(folderPath, ImageSimilarity::Similarity{ similarity });
 }
 
-void ImageOptimizer::OptimizeFolderRecursive(const std::string& folderPath, float similarity /*= 0.999*/)
+OptimizationResult ImageOptimizer::OptimizeFolderRecursive(const std::string& folderPath, float similarity /*= 0.999*/)
 {
-	m_implementation->OptimizeFolderRecursive(folderPath, ImageSimilarity::Similarity{ similarity });
+	return m_implementation->OptimizeFolderRecursive(folderPath, ImageSimilarity::Similarity{ similarity });
 }
 
 void ImageOptimizer::EnableFileLogging( SeverityLevel minimumSeverity /*= trace*/, const std::string& component /*= ""*/ )

@@ -71,7 +71,7 @@
     <ClInclude Include="Source\Quality.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\OptimizationResult.h">
+    <ClInclude Include="Include\OptimizationResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
