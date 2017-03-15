@@ -48,23 +48,25 @@ int main(int argc, char* argv[])
 
 	ImageOptimizer imageOptimizer;
 
+	OptimizationResult result;
+
 	auto start = std::chrono::steady_clock::now();
 
 	try
 	{
 		if (fs::is_regular_file(input))
 		{
-			imageOptimizer.OptimizeImage(input, targetSimilarity);
+			result = imageOptimizer.OptimizeImage(input, targetSimilarity);
 		}
 		else if (fs::is_directory(input))
 		{
 			if (recursive)
 			{
-				imageOptimizer.OptimizeFolderRecursive(input, targetSimilarity);
+				result = imageOptimizer.OptimizeFolderRecursive(input, targetSimilarity);
 			}
 			else
 			{
-				imageOptimizer.OptimizeFolder(input, targetSimilarity);
+				result = imageOptimizer.OptimizeFolder(input, targetSimilarity);
 			}
 		}
 		else
@@ -83,7 +85,13 @@ int main(int argc, char* argv[])
 	auto finish = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start).count();
 
-	std::cout << "Done! Processing time: " << duration << "ms";
+	std::cout << "Done! Processing time: " << duration << "ms" << std::endl;
+
+	constexpr int MB = 1024 * 1024;
+
+	std::cout << "Original size: " << result.GetOriginalSize() / MB << " MB" <<
+				" Compressed size: " << result.GetCompressedSize() / MB << " MB" <<
+				" Compression: " << result.GetCompressionPercentage() << "%" << std::endl;
 
 	std::getchar();
 
