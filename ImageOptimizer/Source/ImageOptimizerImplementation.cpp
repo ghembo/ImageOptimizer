@@ -12,7 +12,7 @@
 
 #include <string>
 #include <regex>
-#include <thread>
+#include <future>
 
 using namespace boost::filesystem;
 
@@ -43,7 +43,7 @@ auto ImageOptimizerImplementation::getAllFoldersInFolder(const std::string& fold
 	return folders;
 }
 
-void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
+OptimizationResult ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
 	m_logger.Log(imageFolderPath.data());
 
@@ -51,7 +51,7 @@ void ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolder
 
 	auto filenames = getJpegInFolder(imageFolderPath);
 
-	parallelOptimizeImages(filenames, similarity);
+	return parallelOptimizeImages(filenames, similarity);
 }
 
 void ImageOptimizerImplementation::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
@@ -81,27 +81,34 @@ OptimizationResult ImageOptimizerImplementation::optimizeImages(const iterator_t
 	return result;
 }
 
-void ImageOptimizerImplementation::parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity)
+OptimizationResult ImageOptimizerImplementation::parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity)
 {
 	const auto nthreads = std::thread::hardware_concurrency();
 	const auto nfiles = filenames.size();
 	const int imagesPerThread = nfiles / nthreads;
 
-	std::vector<std::thread> threads(nthreads + 1);
+	std::vector<std::future<OptimizationResult>> futures;
 
 	for (size_t t = 0; t < nthreads; t++)
 	{
 		size_t firstImage = imagesPerThread * t;
 		size_t lastImage = imagesPerThread * (t + 1);
 
-		threads[t] = std::thread{ [=]() {optimizeImages(filenames.cbegin() + firstImage, filenames.cbegin() + lastImage, similarity); } };
+		futures.push_back(std::async(std::launch::async, [=]() {return optimizeImages(filenames.cbegin() + firstImage, filenames.cbegin() + lastImage, similarity); }));
 	}
 
 	int first = imagesPerThread * nthreads;
 
-	threads[nthreads] = std::thread{ [=]() {optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity); } };
+	futures.push_back(std::async(std::launch::async, [=]() {return optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity); }));
 
-	std::for_each(threads.begin(), threads.end(), [](std::thread& t) {t.join(); });
+	OptimizationResult result;
+
+	for (auto& future : futures)
+	{
+		result += future.get();
+	}
+
+	return result;
 }
 
 OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
