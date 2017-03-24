@@ -25,7 +25,7 @@ void displayResult(OptimizationResult result)
 		" Saved: " << (result.GetOriginalSize() - result.GetCompressedSize()) / MB << "MB" << std::endl;
 }
 
-void parseInput(int argc, char* argv[], std::string& input, bool& recursive)
+bool parseInput(int argc, char* argv[], std::string& input, bool& recursive)
 {
 	po::options_description desc("Allowed options");
 
@@ -40,6 +40,14 @@ void parseInput(int argc, char* argv[], std::string& input, bool& recursive)
 	po::variables_map vm;
 	po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
 	po::notify(vm);
+
+	if (vm.count("help")) {
+		std::cout << desc << "\n";
+
+		return false;
+	}
+
+	return true;
 }
 
 int main(int argc, char* argv[])
@@ -47,7 +55,10 @@ int main(int argc, char* argv[])
 	std::string input;
 	bool recursive;
 
-	parseInput(argc, argv, input, recursive);
+	if (!parseInput(argc, argv, input, recursive))
+	{
+		return 0;
+	}
 
 	if (!fs::exists(input))
 	{
