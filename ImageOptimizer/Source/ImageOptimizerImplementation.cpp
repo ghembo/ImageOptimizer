@@ -55,7 +55,14 @@ OptimizationResult ImageOptimizerImplementation::optimizeImages(const iterator_t
 
 	for (auto image = first; image != last; ++image)
 	{
-		result += OptimizeImage(*image, similarity);
+		try
+		{
+			result += OptimizeImage(*image, similarity);
+		}
+		catch (const std::exception& e)
+		{
+			m_logger.Log("Error during optimization, unable to process image " + *image + ": \n" + std::string(e.what()));
+		}
 	}
 
 	return result;
