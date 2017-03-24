@@ -25,15 +25,39 @@ namespace ImageSimilarity
 
 
 
+	class Size
+	{
+	public:
+		Size(unsigned int width, unsigned int height) :
+			m_width{ width }, m_height{ height }
+		{
+		}
+
+		unsigned int Total() { return m_width * m_height; };
+
+		Size operator/(unsigned int divisor) const { return{ m_width / divisor, m_height / divisor }; };
+		Size operator*(unsigned int divisor) const { return{ m_width * divisor, m_height * divisor }; };
+
+		unsigned int m_width;
+		unsigned int m_height;
+	};
+
+	Size ImageSize(const cv::Mat& image)
+	{
+		return{ (unsigned int)image.cols, (unsigned int)image.rows };
+	}
+
 	#define SQUARE_LEN 8
 
-	std::pair<int, int> convolve(float *img, int width, int height, float *result)
+	Size convolve(float *img, Size size, float *result)
 	{
-		int dst_w = width - SQUARE_LEN + 1;
-		int dst_h = height - SQUARE_LEN + 1;
+		int width = size.m_width;
+		unsigned int height = size.m_height;
+		unsigned int dst_w = width - SQUARE_LEN + 1;
+		unsigned int dst_h = height - SQUARE_LEN + 1;
 		float* dst = result ? result : img;
 
-		double* boxes = new double[width * height];
+		double* boxes = new double[size.Total()];
 
 		boxes[0] = img[0];
 		for (int x = 1; x < width; x++)
@@ -41,7 +65,7 @@ namespace ImageSimilarity
 			boxes[x] = boxes[x-1] + img[x];
 		}
 
-		for (int y = 1; y < height; y++)
+		for (unsigned int y = 1; y < height; y++)
 		{
 			double* b = &boxes[y * width];
 			*b++ = boxes[(y - 1) * width] + img[y * width];
@@ -54,16 +78,16 @@ namespace ImageSimilarity
 			
  		dst[0] = boxes[(SQUARE_LEN - 1) * width + SQUARE_LEN - 1];
 
-		for (int x = 1; x < dst_w; x++)
+		for (unsigned int x = 1; x < dst_w; x++)
 		{
 			dst[x] = (boxes[(SQUARE_LEN - 1) * width + x + SQUARE_LEN - 1] - boxes[(SQUARE_LEN - 1) * width + x - 1]);
 		}
 
-		for (int y = 1; y < dst_h; ++y)
+		for (unsigned int y = 1; y < dst_h; ++y)
 		{
 			dst[y * dst_w] = (boxes[(y + SQUARE_LEN - 1) * width + SQUARE_LEN - 1] - boxes[(y - 1) * width + SQUARE_LEN - 1]);
 
-			for (int x = 1; x < dst_w; ++x)
+			for (unsigned int x = 1; x < dst_w; ++x)
 			{
 				double box_sum = boxes[(y + SQUARE_LEN - 1) * width + x - 1 + SQUARE_LEN]
 								- boxes[(y + SQUARE_LEN - 1) * width + x - 1]
@@ -79,25 +103,24 @@ namespace ImageSimilarity
 		return{ dst_w , dst_h };
 	}
 
-	std::pair<int, int> decimate(float *image, int width, int height, int scaling)
+	Size decimate(float *image, Size size, unsigned int scaling)
 	{
-		int scaledWidth = width / scaling;
-		int effectiveWidth = scaledWidth * scaling;
-		int scaledHeight = height / scaling;
-		int effectiveHeight = scaledHeight * scaling;
+		const unsigned int width = size.m_width;
+		const Size scaledSize = size / scaling;
+		const Size efectiveSize = scaledSize * scaling;
 		float* destination = image;
 
-		float normalization = 1.0f / (scaling * scaling);
+		const float normalization = 1.0f / (scaling * scaling);
 
-		for (int y = 0; y < effectiveHeight; y += scaling)
+		for (unsigned int y = 0; y < efectiveSize.m_height; y += scaling)
 		{
-			for (int x = 0; x < effectiveWidth; x += scaling)
+			for (unsigned int x = 0; x < efectiveSize.m_width; x += scaling)
 			{
 				float sum = 0.0f;
-				for (int row = 0; row < scaling; row++) // unroll agambini
+				for (unsigned int row = 0; row < scaling; row++) // unroll agambini
 				{
 					float* curr_img = image + (y + row) * width + x;
-					for (int col = 0; col < scaling; col++)
+					for (unsigned int col = 0; col < scaling; col++)
 					{
 						sum += *curr_img++;
 					}
@@ -107,22 +130,24 @@ namespace ImageSimilarity
 			}
 		}
 
-		return { scaledWidth , scaledHeight };
+		return scaledSize;
 	}
 
-	float ssim(float *ref, float *cmp, int width, int height)
+	float ssim(float *ref, float *cmp, Size size)
 	{
-		float* ref_mu = new float[width*height];
-		float* cmp_mu = new float[width*height];
-		float* ref_sigma_sqd = new float[width*height];
-		float* cmp_sigma_sqd = new float[width*height];
-		float* sigma_both = new float[width*height];
+		unsigned int totalSize = size.Total();
+
+		float* ref_mu = new float[totalSize];
+		float* cmp_mu = new float[totalSize];
+		float* ref_sigma_sqd = new float[totalSize];
+		float* cmp_sigma_sqd = new float[totalSize];
+		float* sigma_both = new float[totalSize];
 
 		/* Calculate mean */
-		convolve(ref, width, height, ref_mu);
-		convolve(cmp, width, height, cmp_mu);
+		convolve(ref, size, ref_mu);
+		convolve(cmp, size, cmp_mu);
 		
-		for (int offset = 0; offset < width * height; offset++)
+		for (unsigned int offset = 0; offset < totalSize; offset++)
 		{
 			ref_sigma_sqd[offset] = ref[offset] * ref[offset];
 			cmp_sigma_sqd[offset] = cmp[offset] * cmp[offset];
@@ -130,9 +155,11 @@ namespace ImageSimilarity
 		}
 
 		/* Calculate sigma */
-		convolve(ref_sigma_sqd, width, height, 0);
-		convolve(cmp_sigma_sqd, width, height, 0);
-		std::tie(width, height) = convolve(sigma_both, width, height, 0);
+		convolve(ref_sigma_sqd, size, 0);
+		convolve(cmp_sigma_sqd, size, 0);
+		size = convolve(sigma_both, size, 0);
+
+		totalSize = size.Total();
 
 		constexpr int L = 255;
 		constexpr float K1 = 0.01f;
@@ -144,7 +171,7 @@ namespace ImageSimilarity
 		double ssim_sum = 0.0;
 		float norm = 1.0f / (SQUARE_LEN * SQUARE_LEN);
 
-		for (int offset = 0; offset < width * height; offset++)
+		for (unsigned int offset = 0; offset < totalSize; offset++)
 		{
 			ref_mu[offset] *= norm;
 			cmp_mu[offset] *= norm;
@@ -169,22 +196,22 @@ namespace ImageSimilarity
 		delete[] cmp_sigma_sqd;
 		delete[] sigma_both;
 
-		return (float)(ssim_sum / (width * height));
+		return (float)(ssim_sum / totalSize);
 	}
 
-	int computeScale(int width, int height)
+	int computeScale(Size size)
 	{
-		return std::max(1, (int)(std::min(width, height) / 256.0f + 0.5f)); // TODO
+		return std::max(1, (int)(std::min(size.m_width, size.m_height) / 256.0f + 0.5f)); // TODO
 	}
 
-	std::unique_ptr<float[]> convertToFloat(uchar* image, int width, int height)
+	std::unique_ptr<float[]> convertToFloat(uchar* image, Size size)
 	{
-		int size = width * height;
+		unsigned int totalSize = size.Total();
 
-		auto floatImage = std::make_unique<float[]>(size);
+		auto floatImage = std::make_unique<float[]>(totalSize);
 		auto floatImagePointer = floatImage.get();
 
-		for (int i = 0; i < size; i++) // *p++ agambini unroll
+		for (unsigned int i = 0; i < totalSize; i++) // *p++ agambini unroll
 		{
 			floatImagePointer[i] = static_cast<float>(image[i]);
 		}
@@ -205,22 +232,21 @@ namespace ImageSimilarity
 			throw std::invalid_argument("Images must be same size");
 		}
 
-		int width = referenceImage.cols;
-		int height = referenceImage.rows;
+		Size size = ImageSize(referenceImage);
 
 		/* Convert image values to floats. Forcing stride = width. */
-		auto referenceFloat = convertToFloat(referenceImage.data, width, height);
-		auto compareFloat = convertToFloat(compareImage.data, width, height);
+		auto referenceFloat = convertToFloat(referenceImage.data, size);
+		auto compareFloat = convertToFloat(compareImage.data, size);
 
-		int scale = computeScale(width, height);
+		int scale = computeScale(size);
 
 		/* Scale the images down if required */
 		if (scale > 1)
 		{
-			decimate(referenceFloat.get(), width, height, scale);
-			std::tie(width, height) = decimate(compareFloat.get(), width, height, scale);
+			decimate(referenceFloat.get(), size, scale);
+			size = decimate(compareFloat.get(), size, scale);
 		}
 		
-		return{ ssim(referenceFloat.get(), compareFloat.get(), width, height) };
+		return{ ssim(referenceFloat.get(), compareFloat.get(), size) };
 	}
 }
