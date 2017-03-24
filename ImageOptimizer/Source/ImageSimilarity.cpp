@@ -28,12 +28,17 @@ namespace ImageSimilarity
 	class Size
 	{
 	public:
+		Size() :
+			m_width{ 0 }, m_height{ 0 }
+		{
+		}
+
 		Size(unsigned int width, unsigned int height) :
 			m_width{ width }, m_height{ height }
 		{
 		}
 
-		unsigned int Total() { return m_width * m_height; };
+		unsigned int Total() const { return m_width * m_height; };
 
 		Size operator/(unsigned int divisor) const { return{ m_width / divisor, m_height / divisor }; };
 		Size operator*(unsigned int divisor) const { return{ m_width * divisor, m_height * divisor }; };
@@ -103,12 +108,14 @@ namespace ImageSimilarity
 		return{ dst_w , dst_h };
 	}
 
-	Size decimate(float *image, Size size, unsigned int scaling)
+	std::pair<std::unique_ptr<float[]>, Size> decimate(uchar* image, Size size, unsigned int scaling)
 	{
 		const unsigned int width = size.m_width;
-		const Size scaledSize = size / scaling;
+		Size scaledSize = size / scaling;
 		const Size efectiveSize = scaledSize * scaling;
-		float* destination = image;
+
+		auto destination = std::make_unique<float[]>(scaledSize.Total());
+		auto destinationPointer = destination.get();
 
 		const float normalization = 1.0f / (scaling * scaling);
 
@@ -116,21 +123,21 @@ namespace ImageSimilarity
 		{
 			for (unsigned int x = 0; x < efectiveSize.m_width; x += scaling)
 			{
-				float sum = 0.0f;
+				unsigned int sum = 0;
 				for (unsigned int row = 0; row < scaling; row++) // unroll agambini
 				{
-					float* curr_img = image + (y + row) * width + x;
+					uchar* curr_img = image + (y + row) * width + x;
 					for (unsigned int col = 0; col < scaling; col++)
 					{
 						sum += *curr_img++;
 					}
 				}
 
-				*destination++ = sum * normalization;
+				*destinationPointer++ = sum * normalization;
 			}
 		}
 
-		return scaledSize;
+		return{ std::move(destination), std::move(scaledSize) };
 	}
 
 	float ssim(float *ref, float *cmp, Size size)
@@ -235,16 +242,23 @@ namespace ImageSimilarity
 		Size size = ImageSize(referenceImage);
 
 		/* Convert image values to floats. Forcing stride = width. */
-		auto referenceFloat = convertToFloat(referenceImage.data, size);
-		auto compareFloat = convertToFloat(compareImage.data, size);
+		std::unique_ptr<float[]> referenceFloat;
+		std::unique_ptr<float[]> compareFloat;
 
 		int scale = computeScale(size);
 
-		/* Scale the images down if required */
 		if (scale > 1)
 		{
-			decimate(referenceFloat.get(), size, scale);
-			size = decimate(compareFloat.get(), size, scale);
+			Size newSize;
+			std::tie(referenceFloat, newSize) = decimate(referenceImage.data, size, scale);
+			std::tie(compareFloat, newSize) = decimate(compareImage.data, size, scale);
+
+			size = newSize;
+		}
+		else
+		{
+			referenceFloat = convertToFloat(referenceImage.data, size);
+			compareFloat = convertToFloat(compareImage.data, size);
 		}
 		
 		return{ ssim(referenceFloat.get(), compareFloat.get(), size) };
