@@ -15,10 +15,18 @@ namespace fs = boost::filesystem;
 
 
 
-int main(int argc, char* argv[])
+void displayResult(OptimizationResult result)
 {
-	std::string input;
-	bool recursive;
+	constexpr int MB = 1024 * 1024;
+
+	std::cout << "Original size: " << result.GetOriginalSize() / MB << " MB" <<
+		" Compressed size: " << result.GetCompressedSize() / MB << " MB" <<
+		" Compression: " << result.GetCompressionPercentage() << "%" <<
+		" Saved: " << (result.GetOriginalSize() - result.GetCompressedSize()) / MB << "MB" << std::endl;
+}
+
+void parseInput(int argc, char* argv[], std::string& input, bool& recursive)
+{
 	po::options_description desc("Allowed options");
 
 	desc.add_options()
@@ -32,6 +40,14 @@ int main(int argc, char* argv[])
 	po::variables_map vm;
 	po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
 	po::notify(vm);
+}
+
+int main(int argc, char* argv[])
+{
+	std::string input;
+	bool recursive;
+
+	parseInput(argc, argv, input, recursive);
 
 	if (!fs::exists(input))
 	{
@@ -78,8 +94,7 @@ int main(int argc, char* argv[])
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << "Error during optimization:" << std::endl;
-		std::cout << e.what();
+		std::cout << "Error during optimization:" << std::endl << e.what() << std::endl;
 	}
 
 	auto finish = std::chrono::steady_clock::now();
@@ -87,12 +102,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "Done! Processing time: " << duration << "ms" << std::endl;
 
-	constexpr int MB = 1024 * 1024;
-
-	std::cout << "Original size: " << result.GetOriginalSize() / MB << " MB" <<
-				" Compressed size: " << result.GetCompressedSize() / MB << " MB" <<
-				" Compression: " << result.GetCompressionPercentage() << "%" <<
-				" Saved: " << (result.GetOriginalSize() - result.GetCompressedSize()) / MB<< "MB" << std::endl;
+	displayResult(result);
 
 	std::getchar();
 
