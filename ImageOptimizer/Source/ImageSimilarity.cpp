@@ -241,7 +241,6 @@ namespace ImageSimilarity
 
 		Size size = ImageSize(referenceImage);
 
-		/* Convert image values to floats. Forcing stride = width. */
 		std::unique_ptr<float[]> referenceFloat;
 		std::unique_ptr<float[]> compareFloat;
 
