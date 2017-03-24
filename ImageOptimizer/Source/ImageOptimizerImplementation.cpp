@@ -107,7 +107,7 @@ OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::strin
 
 	image = JpegEncoderDecoder::LoadColorImage(imagePath);
 		
-	auto temporaryFilename(getTemporaryFilename(imagePath));
+	auto temporaryFilename(getSuffixedFilename(imagePath, "_tmp"));
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
@@ -115,7 +115,7 @@ OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::strin
 
 	logFileSizesAndCompression(result);
 
-	auto newFileName(addSuffixToFileName(imagePath, "_compressed"));
+	auto newFileName(getSuffixedFilename(imagePath, "_compressed"));
 
 	if (!result.IsCompressed())
 	{
@@ -200,11 +200,11 @@ std::string ImageOptimizerImplementation::addSuffixToFileName(const std::string&
 	return newFilename.string();
 }
 
-std::string ImageOptimizerImplementation::getTemporaryFilename(const std::string& filename)
+std::string ImageOptimizerImplementation::getSuffixedFilename(const std::string& filename, const std::string& suffix)
 {
 	for (unsigned long long counter = 0; ; counter++)
 	{
-		auto temporaryFileName = addSuffixToFileName(filename, "_tmp" + std::to_string(counter));
+		auto temporaryFileName = addSuffixToFileName(filename, suffix + std::to_string(counter));
 
 		if (!exists(temporaryFileName))
 		{

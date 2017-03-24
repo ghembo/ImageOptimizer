@@ -43,7 +43,7 @@ private:
 	static bool isJpegFile(const boost::filesystem::directory_entry& file);
 	static std::vector<std::string> getJpegInFolder(const std::string& imageFolderPath);
 	static std::vector<std::string> getAllFoldersInFolder(const std::string& folderPath);
-	static std::string getTemporaryFilename(const std::string& filename);
+	static std::string getSuffixedFilename(const std::string& filename, const std::string& suffix);
 
 	OptimizationResult parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity);
 	OptimizationResult optimizeImages(const iterator_t& first, const iterator_t& last, ImageSimilarity::Similarity similarity);
