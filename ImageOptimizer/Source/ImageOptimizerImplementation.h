@@ -38,12 +38,11 @@ private:
 
 	static std::string addSuffixToFileName(const std::string& filename, const std::string& suffix);
 
-	static filesize_t getFileSize(const std::string& fileName);
 	static unsigned int computeCompression(filesize_t originalSize, filesize_t newSize);
 
 	static bool isJpegFile(const boost::filesystem::directory_entry& file);
-	static auto getJpegInFolder(const std::string& imageFolderPath);
-	static auto getAllFoldersInFolder(const std::string& folderPath);
+	static std::vector<std::string> getJpegInFolder(const std::string& imageFolderPath);
+	static std::vector<std::string> getAllFoldersInFolder(const std::string& folderPath);
 	static std::string getTemporaryFilename(const std::string& filename);
 
 	OptimizationResult parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity);

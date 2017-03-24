@@ -23,26 +23,6 @@ ImageOptimizerImplementation::ImageOptimizerImplementation():
 {
 }
 
-auto ImageOptimizerImplementation::getJpegInFolder(const std::string& imageFolderPath)
-{
-	std::vector<std::string> filenames;
-
-	boost::transform(boost::make_iterator_range(directory_iterator(path(imageFolderPath)), {}) | boost::adaptors::filtered(isJpegFile),
-		back_inserter(filenames), [](const auto& file) {return file.path().string(); });
-
-	return filenames;
-}
-
-auto ImageOptimizerImplementation::getAllFoldersInFolder(const std::string& folderPath)
-{
-	std::vector<std::string> folders;
-
-	boost::transform(boost::make_iterator_range(recursive_directory_iterator(path(folderPath)), {}) | boost::adaptors::filtered([](const auto& entry) {return is_directory(entry); }),
-		back_inserter(folders), [](const auto& file) {return file.path().string(); });
-
-	return folders;
-}
-
 OptimizationResult ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
 	m_logger.Log(imageFolderPath.data());
@@ -97,7 +77,7 @@ OptimizationResult ImageOptimizerImplementation::parallelOptimizeImages(const st
 		futures.push_back(std::async(std::launch::async, [=]() {return optimizeImages(filenames.cbegin() + firstImage, filenames.cbegin() + lastImage, similarity); }));
 	}
 
-	int first = imagesPerThread * nthreads;
+	size_t first = imagesPerThread * nthreads;
 
 	futures.push_back(std::async(std::launch::async, [=]() {return optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity); }));
 
@@ -131,7 +111,7 @@ OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::strin
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
-	OptimizationResult result{ getFileSize(imagePath) , getFileSize(temporaryFilename) };
+	OptimizationResult result{ file_size(imagePath) , file_size(temporaryFilename) };
 
 	logFileSizesAndCompression(result);
 
@@ -233,11 +213,6 @@ std::string ImageOptimizerImplementation::getTemporaryFilename(const std::string
 	}
 }
 
-ImageOptimizerImplementation::filesize_t ImageOptimizerImplementation::getFileSize(const std::string& fileName)
-{
-	return file_size(fileName);
-}
-
 bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
 {
 	if (!is_regular_file(file))
@@ -257,4 +232,24 @@ void ImageOptimizerImplementation::logFileSizesAndCompression(OptimizationResult
 	m_logger.Log("Original size: " + std::to_string(optimizationResult.GetOriginalSize()) +
 				" New size: " + std::to_string(optimizationResult.GetCompressedSize()) + 
 				" Compression: " + std::to_string(compression) + "%");
+}
+
+std::vector<std::string> ImageOptimizerImplementation::getJpegInFolder(const std::string& imageFolderPath)
+{
+	std::vector<std::string> filenames;
+
+	boost::transform(boost::make_iterator_range(directory_iterator(path(imageFolderPath)), {}) | boost::adaptors::filtered(isJpegFile),
+		back_inserter(filenames), [](const auto& file) {return file.path().string(); });
+
+	return filenames;
+}
+
+std::vector<std::string> ImageOptimizerImplementation::getAllFoldersInFolder(const std::string& folderPath)
+{
+	std::vector<std::string> folders;
+
+	boost::transform(boost::make_iterator_range(recursive_directory_iterator(path(folderPath)), {}) | boost::adaptors::filtered([](const auto& entry) {return is_directory(entry); }),
+		back_inserter(folders), [](const auto& file) {return file.path().string(); });
+
+	return folders;
 }
