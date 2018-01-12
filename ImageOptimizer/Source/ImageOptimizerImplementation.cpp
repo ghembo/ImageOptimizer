@@ -6,15 +6,12 @@
 
 #include "opencv2\core\core.hpp"
 
-#include <boost/filesystem.hpp>
-#include <boost/range/algorithm.hpp>
-#include <boost/range/adaptor/filtered.hpp>
-
 #include <string>
 #include <regex>
 #include <future>
+#include <filesystem>
 
-using namespace boost::filesystem;
+namespace fs = std::experimental::filesystem;
 
 
 
@@ -118,7 +115,7 @@ OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::strin
 
 	JpegEncoderDecoder::SaveJpeg(image, temporaryFilename, bestQuality);
 
-	OptimizationResult result{ file_size(imagePath) , file_size(temporaryFilename) };
+	OptimizationResult result{ fs::file_size(imagePath) , fs::file_size(temporaryFilename) };
 
 	logFileSizesAndCompression(result);
 
@@ -126,17 +123,17 @@ OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::strin
 
 	if (!result.IsCompressed())
 	{
-		remove(temporaryFilename);
+		fs::remove(temporaryFilename);
 
 		m_logger.Log("Couldn't compress more");
 
-		copy_file(imagePath, newFileName);
+		fs::copy_file(imagePath, newFileName);
 
 		result = result.GetUncompressedResult();
 	}
 	else
 	{
-		rename(temporaryFilename, newFileName);
+		rename(temporaryFilename.c_str(), newFileName.c_str());
 	}
 
 	return result;
@@ -151,14 +148,14 @@ cv::Mat ImageOptimizerImplementation::loadImage(const std::string& imagePath)
 
 void ImageOptimizerImplementation::validateFolderPath(const std::string& imageFolderPath)
 {
-	path p(imageFolderPath);
+	fs::path p(imageFolderPath);
 
-	if (!exists(p))
+	if (!fs::exists(p))
 	{
 		handleInvalidArgument("Folder doesn't exist");
 	}
 
-	if (!is_directory(p))
+	if (!fs::is_directory(p))
 	{
 		handleInvalidArgument("Path is not a folder");
 	}
@@ -166,14 +163,14 @@ void ImageOptimizerImplementation::validateFolderPath(const std::string& imageFo
 
 void ImageOptimizerImplementation::validateImagePath(const std::string& imagePath)
 {
-	path p(imagePath);
+	fs::path p(imagePath);
 
-	if (!exists(p))
+	if (!fs::exists(p))
 	{
 		handleInvalidArgument("File doesn't exist");
 	}
 
-	if (!is_regular_file(p))
+	if (!fs::is_regular_file(p))
 	{
 		handleInvalidArgument("Path is not a file");
 	}
@@ -200,9 +197,9 @@ void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
 
 std::string ImageOptimizerImplementation::addSuffixToFileName(const std::string& filename, const std::string& suffix)
 {
-	path p(filename);
+	fs::path p(filename);
 
-	path newFilename = p.parent_path() / path(p.stem().string() + suffix + p.extension().string());
+	fs::path newFilename = p.parent_path() / fs::path(p.stem().string() + suffix + p.extension().string());
 
 	return newFilename.string();
 }
@@ -213,16 +210,16 @@ std::string ImageOptimizerImplementation::getSuffixedFilename(const std::string&
 	{
 		auto temporaryFileName = addSuffixToFileName(filename, suffix + std::to_string(counter));
 
-		if (!exists(temporaryFileName))
+		if (!fs::exists(temporaryFileName))
 		{
 			return temporaryFileName;
 		}
 	}
 }
 
-bool ImageOptimizerImplementation::isJpegFile(const directory_entry& file)
+bool ImageOptimizerImplementation::isJpegFile(const fs::directory_entry& file)
 {
-	if (!is_regular_file(file))
+	if (!fs::is_regular_file(file))
 	{
 		return false;
 	}
@@ -245,8 +242,13 @@ std::vector<std::string> ImageOptimizerImplementation::getJpegInFolder(const std
 {
 	std::vector<std::string> filenames;
 
-	boost::transform(boost::make_iterator_range(directory_iterator(path(imageFolderPath)), {}) | boost::adaptors::filtered(isJpegFile),
-		back_inserter(filenames), [](const auto& file) {return file.path().string(); });
+	for (auto& file : fs::directory_iterator(fs::path(imageFolderPath)))
+	{
+		if (isJpegFile(file))
+		{
+			filenames.push_back(file.path().string());
+		}
+	}
 
 	return filenames;
 }
@@ -255,8 +257,13 @@ std::vector<std::string> ImageOptimizerImplementation::getAllFoldersInFolder(con
 {
 	std::vector<std::string> folders;
 
-	boost::transform(boost::make_iterator_range(recursive_directory_iterator(path(folderPath)), {}) | boost::adaptors::filtered([](const auto& entry) {return is_directory(entry); }),
-		back_inserter(folders), [](const auto& file) {return file.path().string(); });
+	for (auto& file : fs::recursive_directory_iterator(fs::path(folderPath)))
+	{
+		if (is_directory(file))
+		{
+			folders.push_back(file.path().string());
+		}
+	}
 
 	return folders;
 }

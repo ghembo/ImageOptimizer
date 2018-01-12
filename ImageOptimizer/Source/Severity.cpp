@@ -1,7 +1,5 @@
 #include "Severity.h"
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include <string>
 
 const Severity::severity_array_t Severity::s_severityNames =
@@ -36,11 +34,25 @@ const std::string& Severity::GetSeverityLevelName(SeverityLevel severity)
 	}
 }
 
+template <typename T1, typename T2>
+bool iequals(const T1& collection1, const T2& collection2)
+{
+	for (size_t i = 0; i < collection1.size(); i++)
+	{
+		if (collection1[i] != collection2[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 SeverityLevel Severity::GetSeverityLevel(const std::string& severityName)
 {	
 	for (array_size_t i = 0; i < s_severityNames.size(); i++)
 	{
-		if (boost::iequals(severityName, s_severityNames[i]))
+		if (iequals(severityName, s_severityNames[i]))
 		{
 			return static_cast<SeverityLevel>(i);
 		}
@@ -53,7 +65,7 @@ bool Severity::IsValid(const std::string& severityName)
 {	
 	for(const auto& name : s_severityNames)
 	{
-		if (boost::iequals(severityName, name))
+		if (iequals(severityName, name))
 		{
 			return true;
 		}

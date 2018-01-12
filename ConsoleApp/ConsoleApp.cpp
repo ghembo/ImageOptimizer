@@ -2,22 +2,22 @@
 
 #include "ImageOptimizer.h"
 
-#include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
+#include "Options.h"
 
 #include <iostream>
-#include <sstream>
-#include <iomanip>
 #include <chrono>
+#include <filesystem>
+#include <numeric>
+#include <regex>
 
-namespace po = boost::program_options;
-namespace fs = boost::filesystem;
+namespace fs = std::experimental::filesystem;
 
 
-
-void displayResult(OptimizationResult result)
+void displayResults(std::vector<OptimizationResult> results)
 {
 	constexpr int MB = 1024 * 1024;
+
+	auto result = std::accumulate(results.begin(), results.end(), OptimizationResult());
 
 	std::cout << "Original size: " << result.GetOriginalSize() / MB << " MB" <<
 		" Compressed size: " << result.GetCompressedSize() / MB << " MB" <<
@@ -25,47 +25,89 @@ void displayResult(OptimizationResult result)
 		" Saved: " << (result.GetOriginalSize() - result.GetCompressedSize()) / MB << "MB" << std::endl;
 }
 
-bool parseInput(int argc, char* argv[], std::string& input, bool& recursive)
+Options parseInput(int argc, char* argv[])
 {
-	po::options_description desc("Allowed options");
-
-	desc.add_options()
-		("help,h", "produce help message")
-		("input,i", po::value<std::string>(&input)->default_value("."), "image or folder to process")
-		("recursive,r", po::bool_switch(&recursive)->default_value(false), "recursive folder processing");
-
-	po::positional_options_description p;
-	p.add("input", -1);
-
-	po::variables_map vm;
-	po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
-	po::notify(vm);
-
-	if (vm.count("help")) {
-		std::cout << desc << "\n";
-
-		return false;
+	try
+	{
+		return Options::parse(argc, argv);
 	}
+	catch (const std::exception& e)
+	{
+		std::cout << "Error parsing options: " << e.what() << std::endl;
 
-	return true;
+		exit(1);
+	}
+}
+
+OptimizationResult processFileOrFolder(const std::string& input, float targetSimilarity, bool recursive)
+{
+	ImageOptimizer imageOptimizer;
+
+	if (fs::is_regular_file(input))
+	{
+		return imageOptimizer.OptimizeImage(input, targetSimilarity);
+	}
+	else if (fs::is_directory(input))
+	{
+		if (recursive)
+		{
+			return imageOptimizer.OptimizeFolderRecursive(input, targetSimilarity);
+		}
+		else
+		{
+			return imageOptimizer.OptimizeFolder(input, targetSimilarity);
+		}
+	}
+	else
+	{
+		throw std::exception("Input isn't a regular file or directory");
+	}
+}
+
+std::string rtrim(std::string input)
+{
+	input.erase(std::find_if(input.rbegin(), input.rend(), [](int ch) { return !std::isspace(ch); }).base(), input.end());
+
+	return input;
 }
 
 int main(int argc, char* argv[])
 {
-	std::string input;
-	bool recursive;
+	auto options = parseInput(argc, argv);
 
-	if (!parseInput(argc, argv, input, recursive))
+	if (options.help())
 	{
+		std::cout << options.helpMessage() << std::endl;
+
 		return 0;
 	}
 
-	if (!fs::exists(input))
+	for (const auto& input : options.input())
 	{
-		std::cout << "Input file or folder doesn't exist" << std::endl;
+		if (!fs::exists(input))
+		{
+			std::cout << "Input file or folder " + input + " doesn't exist" << std::endl;
 
-		return 1;
-	}
+			return 1;
+		}
+		else if (fs::is_regular_file(input))
+		{
+			const std::regex jpegExtension(R"(\.jpe?g$)", std::regex_constants::icase);
+
+			if (!std::regex_match(rtrim(input), jpegExtension))
+			{
+				std::cout << "Input file " + input + " is not a Jpeg" << std::endl;
+
+				return 1;
+			}
+		}
+		else if (!fs::is_directory(input))
+		{
+			std::cout << "Input file or folder " + input + " isn't a regular file or directory" << std::endl;
+
+			return 1;
+		}
+	}	
 
 	constexpr float targetSimilarity = 0.9999f;
 
@@ -73,35 +115,16 @@ int main(int argc, char* argv[])
 
 	ImageOptimizer::EnableFileLogging();
 
-	ImageOptimizer imageOptimizer;
-
-	OptimizationResult result;
+	std::vector<OptimizationResult> results;
 
 	auto start = std::chrono::steady_clock::now();
 
 	try
 	{
-		if (fs::is_regular_file(input))
+		for (const auto& input : options.input())
 		{
-			result = imageOptimizer.OptimizeImage(input, targetSimilarity);
-		}
-		else if (fs::is_directory(input))
-		{
-			if (recursive)
-			{
-				result = imageOptimizer.OptimizeFolderRecursive(input, targetSimilarity);
-			}
-			else
-			{
-				result = imageOptimizer.OptimizeFolder(input, targetSimilarity);
-			}
-		}
-		else
-		{
-			std::cout << "Input isn't a regular file or directory" << std::endl;
-
-			return 1;
-		}
+			results.push_back(processFileOrFolder(input, targetSimilarity, options.recursive()));
+		}		
 	}
 	catch (const std::exception& e)
 	{
@@ -113,7 +136,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "Done! Processing time: " << duration << "ms" << std::endl;
 
-	displayResult(result);
+	displayResults(results);
 
 	std::getchar();
 

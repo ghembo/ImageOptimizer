@@ -28,4 +28,9 @@ private:
 	filesize_t m_compressedSize;
 };
 
+inline OptimizationResult operator+(OptimizationResult first, const OptimizationResult& second)
+{
+	return first += second;
+}
+
 #endif // !OptimizationResult_h__

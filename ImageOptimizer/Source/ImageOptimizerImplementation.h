@@ -7,18 +7,11 @@
 #include "OptimizationResult.h"
 
 #include <string>
+#include <filesystem>
 
 namespace cv
 {
 	class Mat;
-}
-
-namespace boost
-{
-	namespace filesystem
-	{
-		class directory_entry;
-	}
 }
 
 class OptimizationSequence;
@@ -40,7 +33,7 @@ private:
 
 	static unsigned int computeCompression(filesize_t originalSize, filesize_t newSize);
 
-	static bool isJpegFile(const boost::filesystem::directory_entry& file);
+	static bool isJpegFile(const std::experimental::filesystem::directory_entry& file);
 	static std::vector<std::string> getJpegInFolder(const std::string& imageFolderPath);
 	static std::vector<std::string> getAllFoldersInFolder(const std::string& folderPath);
 	static std::string getSuffixedFilename(const std::string& filename, const std::string& suffix);
