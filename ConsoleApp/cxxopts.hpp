@@ -295,6 +295,12 @@ namespace cxxopts
 
     virtual std::shared_ptr<Value>
     implicit_value(const std::string& value) = 0;
+	
+	virtual std::shared_ptr<Value>
+	target(void* target) = 0;
+
+	virtual void
+	try_set_target() const = 0;
 
     virtual bool
     is_boolean() const = 0;
@@ -718,11 +724,13 @@ namespace cxxopts
       abstract_value()
       : m_result(std::make_shared<T>())
       , m_store(m_result.get())
+      , m_target(nullptr)
       {
       }
 
       abstract_value(T* t)
       : m_store(t)
+	  , m_target(nullptr)
       {
       }
 
@@ -744,6 +752,7 @@ namespace cxxopts
         m_implicit = rhs.m_implicit;
         m_default_value = rhs.m_default_value;
         m_implicit_value = rhs.m_implicit_value;
+		m_target = rhs.m_target;
       }
 
       void
@@ -770,11 +779,11 @@ namespace cxxopts
         return m_default;
       }
 
-      bool
-      has_implicit() const
-      {
-        return m_implicit;
-      }
+	  bool
+	  has_implicit() const
+	  {
+		  return m_implicit;
+	  }
 
       std::shared_ptr<Value>
       default_value(const std::string& value)
@@ -791,6 +800,22 @@ namespace cxxopts
         m_implicit_value = value;
         return shared_from_this();
       }
+
+	  std::shared_ptr<Value>
+	  target(void* target)
+	  {
+		  m_target = static_cast<T*>(target);
+		  return shared_from_this();
+	  }
+
+	  void
+	  try_set_target() const
+	  {
+		  if (m_target)
+		  {
+			  *m_target = *m_store;
+		  }
+	  }
 
       std::string
       get_default_value() const
@@ -826,6 +851,7 @@ namespace cxxopts
       protected:
       std::shared_ptr<T> m_result;
       T* m_store;
+	  T* m_target;
 
       bool m_default = false;
       bool m_implicit = false;
@@ -994,6 +1020,7 @@ namespace cxxopts
       ensure_value(details);
       ++m_count;
       m_value->parse(text);
+	  m_value->try_set_target();
     }
 
     void
@@ -1001,6 +1028,7 @@ namespace cxxopts
     {
       ensure_value(details);
       m_value->parse();
+	  m_value->try_set_target();
       m_count++;
     }
 
