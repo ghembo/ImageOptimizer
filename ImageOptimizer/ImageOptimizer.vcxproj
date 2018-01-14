@@ -101,27 +101,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\ImageOptimizer.cpp" />
-    <ClCompile Include="source\ImageOptimizerImplementation.cpp" />
+    <ClCompile Include="Source\ImageOptimizer.cpp" />
     <ClCompile Include="Source\ImageProcessor.cpp" />
     <ClCompile Include="source\ImageSimilarity.cpp" />
     <ClCompile Include="Source\JpegEncoderDecoder.cpp" />
     <ClCompile Include="source\Logger.cpp" />
     <ClCompile Include="Source\OptimizationResult.cpp" />
     <ClCompile Include="Source\OptimizationSequence.cpp" />
-    <ClCompile Include="source\Severity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\ImageOptimizer.h" />
+    <ClInclude Include="Include\ImageProcessor.h" />
+    <ClInclude Include="Include\ImageSimilarity.h" />
+    <ClInclude Include="Include\Logger.h" />
     <ClInclude Include="Include\OptimizationResult.h" />
-    <ClInclude Include="Include\Severity.h" />
-    <ClInclude Include="Source\ImageOptimizerImplementation.h" />
-    <ClInclude Include="Source\ImageProcessor.h" />
-    <ClInclude Include="Source\ImageSimilarity.h" />
+    <ClInclude Include="Include\Quality.h" />
     <ClInclude Include="Source\JpegEncoderDecoder.h" />
-    <ClInclude Include="Source\Logger.h" />
     <ClInclude Include="Source\OptimizationSequence.h" />
-    <ClInclude Include="Source\Quality.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
