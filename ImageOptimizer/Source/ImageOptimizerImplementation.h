@@ -21,6 +21,8 @@ class  ImageOptimizerImplementation
 public:
 	ImageOptimizerImplementation();
 
+	void SetLogCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback);
+
 	OptimizationResult OptimizeImage(const std::string& imagePath, ImageSimilarity::Similarity similarity);
 	OptimizationResult OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
 	OptimizationResult OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity);
@@ -30,8 +32,6 @@ private:
 	using iterator_t = std::vector<std::string>::const_iterator;
 
 	static std::string addSuffixToFileName(const std::string& filename, const std::string& suffix);
-
-	static unsigned int computeCompression(filesize_t originalSize, filesize_t newSize);
 
 	static bool isJpegFile(const std::experimental::filesystem::directory_entry& file);
 	static std::vector<std::string> getJpegInFolder(const std::string& imageFolderPath);
@@ -49,9 +49,9 @@ private:
 	void handleInvalidArgument(const char* message);
 	void logFileSizesAndCompression(OptimizationResult optimizationResult);
 
-	ImageProcessor m_imageProcessor;
-
 	Logger m_logger;
+
+	ImageProcessor m_imageProcessor;
 };
 
 #endif // ImageProcessorImplementation_h__

@@ -13,8 +13,8 @@
 
 
 
-ImageProcessor::ImageProcessor():
-	m_logger("ImgProc")
+ImageProcessor::ImageProcessor(Logger& logger) :
+	m_logger(logger)
 {
 }
 
@@ -87,5 +87,5 @@ void ImageProcessor::logDurationAndResults(long long duration, const Optimizatio
 		message << result.first << " - " << result.second << std::endl;
 	}
 
-	m_logger.Log(message.str().c_str());
+	m_logger.trace(message.str().c_str());
 }

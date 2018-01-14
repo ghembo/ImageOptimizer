@@ -21,7 +21,7 @@ class OptimizationSequence;
 class  ImageProcessor
 {
 public:
-	ImageProcessor();
+	ImageProcessor(Logger& logger);
 	Quality OptimizeImage(const cv::Mat& image, sim::Similarity targetSimilarity);
 	
 private:
@@ -33,7 +33,7 @@ private:
 
 	void logDurationAndResults(long long duration, const OptimizationSequence& results);
 
-	Logger m_logger;
+	Logger& m_logger;
 };
 
 #endif // ImageProcessor_h__

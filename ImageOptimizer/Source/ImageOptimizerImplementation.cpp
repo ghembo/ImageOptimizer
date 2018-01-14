@@ -15,14 +15,19 @@ namespace fs = std::experimental::filesystem;
 
 
 
-ImageOptimizerImplementation::ImageOptimizerImplementation():
-	m_logger("ImgOpt")
+ImageOptimizerImplementation::ImageOptimizerImplementation() :
+	m_imageProcessor(m_logger)
 {
+}
+
+void ImageOptimizerImplementation::SetLogCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback)
+{
+	m_logger.setCallbacks(traceCallback, warningCallback, errorCallback);
 }
 
 OptimizationResult ImageOptimizerImplementation::OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
-	m_logger.Log(imageFolderPath.data());
+	m_logger.trace(imageFolderPath.data());
 
 	validateFolderPath(imageFolderPath);
 
@@ -58,7 +63,7 @@ OptimizationResult ImageOptimizerImplementation::optimizeImages(const iterator_t
 		}
 		catch (const std::exception& e)
 		{
-			m_logger.Log("Error during optimization, unable to process image " + *image + ": \n" + std::string(e.what()));
+			m_logger.trace("Error during optimization, unable to process image " + *image + ": \n" + std::string(e.what()));
 		}
 	}
 
@@ -97,13 +102,13 @@ OptimizationResult ImageOptimizerImplementation::parallelOptimizeImages(const st
 
 OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
 {
- 	m_logger.Log(imagePath.data());
+ 	m_logger.trace(imagePath.data());
 
 	auto image = loadImage(imagePath);
 
 	validateImage(image);
 
-	m_logger.Log("Target ssim: " + std::to_string(similarity.GetValue()));
+	m_logger.trace("Target ssim: " + std::to_string(similarity.GetValue()));
 	
 	auto bestQuality = m_imageProcessor.OptimizeImage(image, similarity);
 
@@ -125,7 +130,7 @@ OptimizationResult ImageOptimizerImplementation::OptimizeImage( const std::strin
 	{
 		fs::remove(temporaryFilename);
 
-		m_logger.Log("Couldn't compress more");
+		m_logger.trace("Couldn't compress more");
 
 		fs::copy_file(imagePath, newFileName);
 
@@ -191,7 +196,7 @@ void ImageOptimizerImplementation::validateImage(const cv::Mat& image)
 
 void ImageOptimizerImplementation::handleInvalidArgument(const char* message)
 {
-	m_logger.Log(message);
+	m_logger.trace(message);
 	throw std::invalid_argument(message);
 }
 
@@ -233,7 +238,7 @@ void ImageOptimizerImplementation::logFileSizesAndCompression(OptimizationResult
 {
 	auto compression = optimizationResult.GetCompressionPercentage();
 
-	m_logger.Log("Original size: " + std::to_string(optimizationResult.GetOriginalSize()) +
+	m_logger.trace("Original size: " + std::to_string(optimizationResult.GetOriginalSize()) +
 				" New size: " + std::to_string(optimizationResult.GetCompressedSize()) + 
 				" Compression: " + std::to_string(compression) + "%");
 }

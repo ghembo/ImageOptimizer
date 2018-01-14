@@ -1,33 +1,27 @@
 #ifndef Logger_h__
 #define Logger_h__
 
-#include "Severity.h"
+#include "ImageOptimizer.h"
 
 #include <string>
 
 class Logger
 {
 public:
-	Logger();
-	Logger(const char* channel);
+	void setCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback);
 
-	template<typename T> void Log(const T& message) { /*BOOST_LOG(m_logger) << message;*/ };
-	template<typename T> void Log(SeverityLevel severity, const T& message) { /*BOOST_LOG_SEV(m_logger, severity) << message;*/ };
+	void trace(const char* message);
+	void warning(const char* message);
+	void error(const char* message);
 
-	static void EnableFileLogging(SeverityLevel minimumSeverity, const std::string& component);
-	static void DisableFileLogging();
-	static void SetMinimumLoggingLevel(SeverityLevel minimumSeverity);
+	void trace(const std::string& message);
+	void warning(const std::string& message);
+	void error(const std::string& message);
 
 private:
-	void TryInitialize();
-	void Initialize();
-
-	//using text_file_sink_t = boost::log::sinks::synchronous_sink< boost::log::sinks::text_file_backend >;
-
-	static bool s_initialized;
-	//static boost::shared_ptr<text_file_sink_t> s_textFileSink;
-
-	//boost::log::sources::severity_channel_logger<SeverityLevel, std::string> m_logger;
+	traceCallback_t m_traceCallback = nullptr;
+	warningCallback_t m_warningCallback = nullptr;
+	errorCallback_t m_errorCallback = nullptr;
 };
 
 #endif

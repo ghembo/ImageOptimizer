@@ -7,8 +7,12 @@
 #include "Severity.h"
 #include "OptimizationResult.h"
 
-class ImageOptimizerImplementation;
 
+using traceCallback_t = void(*)(const char*);
+using warningCallback_t = void(*)(const char*);
+using errorCallback_t = void(*)(const char*);
+
+class ImageOptimizerImplementation;
 
 class ImageOptimizer
 {
@@ -16,10 +20,9 @@ public:
 	ImageOptimizer();
 	~ImageOptimizer();
 	
-	static void EnableFileLogging(SeverityLevel minimumSeverity = SeverityLevel::trace, const std::string& component = "");
-	static void SetMinimumLoggingLevel(SeverityLevel minimumSeverity);
-
 	static std::string GetVersion();
+
+	void SetLogCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback);
 
 	OptimizationResult OptimizeImage(const std::string& imagePath, float similarity = 0.9999f);
 	OptimizationResult OptimizeFolder(const std::string& folderPath, float similarity = 0.9999f);

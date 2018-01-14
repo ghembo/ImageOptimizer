@@ -1,126 +1,49 @@
 #include "Logger.h"
 
 #include <string>
-#include <iostream>
-#include <fstream>
 
-
-bool Logger::s_initialized = false;
-
-//boost::shared_ptr< Logger::text_file_sink_t > Logger::s_textFileSink;
-//
-//BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", SeverityLevel)
-//
-//static const auto FORMAT = expressions::format("[%1%] <%2%> %3%: %4%\n")
-//						% expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%H:%M:%S")
-//						% severity
-//						% expressions::attr< std::string >("Channel")
-//						% expressions::smessage;
-//
-//static const auto CONSOLE_FORMAT = expressions::format("%1%: %2%\n")
-//									% expressions::attr< std::string >("Channel")
-//									% expressions::smessage;
-
-// Formatting logic for the severity level
-template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT >& operator<< (std::basic_ostream< CharT, TraitsT >& stream, SeverityLevel severity)
+void Logger::setCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback)
 {
-	stream << Severity::GetSeverityLevelName(severity);
-
-	return stream;
+	m_traceCallback = traceCallback;
+	m_warningCallback = warningCallback;
+	m_errorCallback = errorCallback;
 }
 
-Logger::Logger()
-	//: m_logger(keywords::channel = "Global")
+void Logger::trace(const char* message)
 {
-	TryInitialize();
-}
-
-Logger::Logger( const char* channel )
-	//: m_logger(keywords::channel = channel)
-{
-	TryInitialize();
-}
-
-void Logger::TryInitialize()
-{
-	if (!s_initialized)
+	if (m_traceCallback != nullptr)
 	{
-		s_initialized = true;
-
-		Initialize();
+		m_traceCallback(message);
 	}
 }
 
-void Logger::Initialize()
+void Logger::warning(const char* message)
 {
-	/*register_simple_formatter_factory< SeverityLevel, char >("Severity");
-
-	boost::shared_ptr< core > core = core::get();
-
-	core->add_global_attribute("TimeStamp", attributes::local_clock());
-	
-	typedef sinks::synchronous_sink< sinks::debug_output_backend > sink_t;
-
-	boost::shared_ptr< sink_t > sink(new sink_t());
-
-	sink->set_filter(expressions::is_debugger_present());
-
-	sink->set_formatter(FORMAT);
-
-	core->add_sink(sink);
-
-	add_console_log(std::cout, keywords::format= CONSOLE_FORMAT);*/
+	if (m_warningCallback != nullptr)
+	{
+		m_warningCallback(message);
+	}
 }
 
-void Logger::EnableFileLogging(SeverityLevel minimumSeverity, const std::string& component)
+void Logger::error(const char* message)
 {
-	DisableFileLogging();
-	
-	const char* logPattern = "ImageProcessorLog_%3N.txt";
-
-	/*boost::shared_ptr< sinks::text_file_backend > backend =
-		boost::make_shared< sinks::text_file_backend >(
-			keywords::file_name = logPattern,
-			keywords::rotation_size = 5 * 1024 * 1024);
-
-	const char* logFolder = "logs";
-
-	backend->set_file_collector(sinks::file::make_collector(keywords::target = logFolder));
-
-	backend->scan_for_files();
-
-	s_textFileSink.reset(new text_file_sink_t(backend));
-
-	s_textFileSink->set_formatter(FORMAT);
-
-	if (component.empty())
+	if (m_errorCallback != nullptr)
 	{
-		s_textFileSink->set_filter(severity >= minimumSeverity);
+		m_errorCallback(message);
 	}
-	else
-	{
-		s_textFileSink->set_filter(
-			severity >= minimumSeverity &&
-			expressions::attr< std::string >("Channel") == component);
-	}
-	
-	core::get()->add_sink(s_textFileSink);*/
 }
 
-void Logger::DisableFileLogging()
+void Logger::trace(const std::string & message)
 {
-	/*core::get()->remove_sink(s_textFileSink);
-
-	if(s_textFileSink)
-	{
-		s_textFileSink->flush();
-	}
-
-	s_textFileSink.reset();*/
+	trace(message.c_str());
 }
 
-void Logger::SetMinimumLoggingLevel(SeverityLevel minimumSeverity)
+void Logger::warning(const std::string & message)
 {
-	//core::get()->set_filter(severity >= minimumSeverity);
+	warning(message.c_str());
+}
+
+void Logger::error(const std::string & message)
+{
+	error(message.c_str());
 }
