@@ -43,6 +43,8 @@ OptimizationResult processImageOrFolder(const std::string& input, float targetSi
 {
 	ImageOptimizer imageOptimizer;
 
+	imageOptimizer.SetLogCallbacks([](const char* message) {std::cout << message << std::endl; }, nullptr, nullptr);
+
 	if (fs::is_regular_file(input))
 	{
 		return imageOptimizer.OptimizeImage(input, targetSimilarity);
