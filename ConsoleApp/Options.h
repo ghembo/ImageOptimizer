@@ -15,7 +15,8 @@ public:
 		options.add_options()
 			("h,help", "Print help")
 			("i,input", "Image or folder to process", cxxopts::value<std::vector<std::string>>()->default_value("."))
-			("r,recursive", "Recursive folder processing", cxxopts::value<bool>()->default_value("false"));
+			("r,recursive", "Recursive folder processing", cxxopts::value<bool>()->default_value("false"))
+			("s,ssim", "Similarity score", cxxopts::value<float>()->default_value("0.9999"));
 
 		options.parse_positional("input");
 
@@ -34,6 +35,7 @@ public:
 
 			option.m_recursive = result["recursive"].as<bool>();
 			option.m_input = result["input"].as<std::vector<std::string>>();
+			option.m_ssimScore = result["ssim"].as<float>();
 		}
 		catch (const cxxopts::OptionException& e)
 		{
@@ -63,11 +65,17 @@ public:
 		return m_helpMessage;
 	}
 
+	float ssimScore() const
+	{
+		return m_ssimScore;
+	}
+
 private:
 	Options() = default;
 
 	std::vector<std::string> m_input;
 	std::string m_helpMessage;
+	float m_ssimScore;
 	bool m_recursive;
 	bool m_help;
 };

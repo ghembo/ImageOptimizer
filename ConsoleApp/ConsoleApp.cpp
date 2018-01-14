@@ -39,7 +39,7 @@ Options parseInput(int argc, char* argv[])
 	}
 }
 
-OptimizationResult processFileOrFolder(const std::string& input, float targetSimilarity, bool recursive)
+OptimizationResult processImageOrFolder(const std::string& input, float targetSimilarity, bool recursive)
 {
 	ImageOptimizer imageOptimizer;
 
@@ -64,11 +64,76 @@ OptimizationResult processFileOrFolder(const std::string& input, float targetSim
 	}
 }
 
-std::string rtrim(std::string input)
-{
-	input.erase(std::find_if(input.rbegin(), input.rend(), [](int ch) { return !std::isspace(ch); }).base(), input.end());
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+		return !std::isspace(ch);
+	}));
+}
 
-	return input;
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+		return !std::isspace(ch);
+	}).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+	ltrim(s);
+	rtrim(s);
+}
+
+// trim from start (copying)
+static inline std::string ltrim_copy(std::string s) {
+	ltrim(s);
+	return s;
+}
+
+// trim from end (copying)
+static inline std::string rtrim_copy(std::string s) {
+	rtrim(s);
+	return s;
+}
+
+// trim from both ends (copying)
+static inline std::string trim_copy(std::string s) {
+	trim(s);
+	return s;
+}
+
+bool hasJpegExtension(const std::string& word)
+{
+	const std::regex jpegExtension(R"(\.jpe?g\s*$)", std::regex_constants::icase);
+
+	return std::regex_match(word, jpegExtension);
+}
+
+bool validateInputPath(const std::string& input)
+{
+	if (!fs::exists(input))
+	{
+		std::cout << "Input file or folder " + input + " doesn't exist" << std::endl;
+
+		return false;
+	}
+	else if (fs::is_regular_file(input))
+	{
+		if (!hasJpegExtension(input))
+		{
+			std::cout << "Input file " + input + " is not a Jpeg" << std::endl;
+
+			return false;
+		}
+	}
+	else if (!fs::is_directory(input))
+	{
+		std::cout << "Input file or folder " + input + " isn't a regular file or directory" << std::endl;
+
+		return false;
+	}
+
+	return true;
 }
 
 int main(int argc, char* argv[])
@@ -84,36 +149,13 @@ int main(int argc, char* argv[])
 
 	for (const auto& input : options.input())
 	{
-		if (!fs::exists(input))
+		if (!validateInputPath(input))
 		{
-			std::cout << "Input file or folder " + input + " doesn't exist" << std::endl;
-
-			return 1;
-		}
-		else if (fs::is_regular_file(input))
-		{
-			const std::regex jpegExtension(R"(\.jpe?g$)", std::regex_constants::icase);
-
-			if (!std::regex_match(rtrim(input), jpegExtension))
-			{
-				std::cout << "Input file " + input + " is not a Jpeg" << std::endl;
-
-				return 1;
-			}
-		}
-		else if (!fs::is_directory(input))
-		{
-			std::cout << "Input file or folder " + input + " isn't a regular file or directory" << std::endl;
-
 			return 1;
 		}
 	}	
 
-	constexpr float targetSimilarity = 0.9999f;
-
 	std::cout << ImageOptimizer::GetVersion() << std::endl;
-
-	ImageOptimizer::EnableFileLogging();
 
 	std::vector<OptimizationResult> results;
 
@@ -123,7 +165,7 @@ int main(int argc, char* argv[])
 	{
 		for (const auto& input : options.input())
 		{
-			results.push_back(processFileOrFolder(input, targetSimilarity, options.recursive()));
+			results.push_back(processImageOrFolder(input, options.ssimScore(), options.recursive()));
 		}		
 	}
 	catch (const std::exception& e)
