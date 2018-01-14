@@ -1,5 +1,4 @@
-#ifndef Quality_h__
-#define Quality_h__
+#pragma once
 
 using Quality = unsigned int;
 
@@ -15,5 +14,3 @@ private:
 	Quality m_minimumQuality;
 	Quality m_maximumQuality;
 };
-
-#endif // Quality_h__

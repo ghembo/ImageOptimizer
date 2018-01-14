@@ -1,5 +1,4 @@
-#ifndef OptimizationSequence_h__
-#define OptimizationSequence_h__
+#pragma once
 
 #include "ImageSimilarity.h"
 #include "Quality.h"
@@ -37,5 +36,3 @@ private:
 	sequence_t m_optimizationResults;
 	ImageSimilarity::Similarity m_targetSimilarity;
 };
-
-#endif // !OptimizationSequence_h__

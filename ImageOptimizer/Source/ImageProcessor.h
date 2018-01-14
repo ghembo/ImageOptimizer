@@ -1,5 +1,4 @@
-#ifndef ImageProcessor_h__
-#define ImageProcessor_h__
+#pragma once
 
 #include "Logger.h"
 #include "Quality.h"
@@ -35,5 +34,3 @@ private:
 
 	Logger& m_logger;
 };
-
-#endif // ImageProcessor_h__

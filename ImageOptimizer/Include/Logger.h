@@ -1,5 +1,4 @@
-#ifndef Logger_h__
-#define Logger_h__
+#pragma once
 
 #include <string>
 
@@ -25,5 +24,3 @@ private:
 	warningCallback_t m_warningCallback = nullptr;
 	errorCallback_t m_errorCallback = nullptr;
 };
-
-#endif

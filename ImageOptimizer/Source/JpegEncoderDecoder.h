@@ -1,5 +1,4 @@
-#ifndef JpegEncoderDecoder_h__
-#define JpegEncoderDecoder_h__
+#pragma once
 
 #include "opencv2/core/hal/interface.h"
 
@@ -24,5 +23,3 @@ public:
 
 	static void SaveJpeg(const cv::Mat & image, const std::string& filename, unsigned int quality);
 };
-
-#endif // JpegEncoderDecoder_h__

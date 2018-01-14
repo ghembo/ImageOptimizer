@@ -1,7 +1,4 @@
-#ifndef OptimizationResult_h__
-#define OptimizationResult_h__
-
-
+#pragma once
 
 class OptimizationResult
 {
@@ -32,5 +29,3 @@ inline OptimizationResult operator+(OptimizationResult first, const Optimization
 {
 	return first += second;
 }
-
-#endif // !OptimizationResult_h__

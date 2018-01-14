@@ -1,5 +1,4 @@
-#ifndef ImageSimilarity_h__
-#define ImageSimilarity_h__
+#pragma once
 
 #include <ostream>
 
@@ -37,6 +36,3 @@ namespace ImageSimilarity
 
 	Similarity ComputeSsim(const cv::Mat& referenceImage, const cv::Mat& compareImage);
 }
-
-#endif // !ImageSimilarity_h__
-

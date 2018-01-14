@@ -1,5 +1,4 @@
-#ifndef ImageProcessorImplementation_h__
-#define ImageProcessorImplementation_h__
+#pragma once
 
 #include "Logger.h"
 #include "ImageSimilarity.h"
@@ -57,5 +56,3 @@ private:
 
 	std::unique_ptr<ImageProcessor> m_imageProcessor;
 };
-
-#endif // ImageProcessorImplementation_h__
