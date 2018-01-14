@@ -87,5 +87,5 @@ void ImageProcessor::logDurationAndResults(long long duration, const Optimizatio
 		message << result.first << " - " << result.second << std::endl;
 	}
 
-	m_logger.trace(message.str().c_str());
+	m_logger.trace(message.str());
 }

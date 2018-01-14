@@ -103,9 +103,7 @@ OptimizationResult ImageOptimizer::parallelOptimizeImages(const std::vector<std:
 
 	OptimizationResult result = optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity);
 
-	std::accumulate(futures.begin(), futures.end(), result, [](auto& total, auto& future) {return total + future.get(); });
-
-	return result;
+	return std::accumulate(futures.begin(), futures.end(), result, [](auto& total, auto& future) {return total + future.get(); });
 }
 
 OptimizationResult ImageOptimizer::OptimizeImage( const std::string& imagePath, ImageSimilarity::Similarity similarity)
