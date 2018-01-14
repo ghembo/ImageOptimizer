@@ -3,6 +3,7 @@
 
 #include <string>
 #include <array>
+#include <ostream>
 
 enum class SeverityLevel
 {
@@ -31,5 +32,13 @@ private:
 	static const SeverityLevel s_defaultSeverityLevel;
 	static const std::string& s_defaultSeverityLevelName;
 };
+
+template< typename CharT, typename TraitsT >
+inline std::basic_ostream< CharT, TraitsT >& operator<< (std::basic_ostream< CharT, TraitsT >& stream, SeverityLevel severity)
+{
+	stream << Severity::GetSeverityLevelName(severity);
+
+	return stream;
+}
 
 #endif
