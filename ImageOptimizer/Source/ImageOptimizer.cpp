@@ -11,6 +11,7 @@
 #include <regex>
 #include <future>
 #include <filesystem>
+#include <numeric>
 
 namespace fs = std::experimental::filesystem;
 
@@ -37,7 +38,7 @@ void ImageOptimizer::SetLogCallbacks(traceCallback_t traceCallback, warningCallb
 
 OptimizationResult ImageOptimizer::OptimizeFolder(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
-	m_logger.trace(imageFolderPath.data());
+	m_logger.trace(imageFolderPath);
 
 	validateFolderPath(imageFolderPath);
 
@@ -48,6 +49,8 @@ OptimizationResult ImageOptimizer::OptimizeFolder(const std::string& imageFolder
 
 OptimizationResult ImageOptimizer::OptimizeFolderRecursive(const std::string& imageFolderPath, ImageSimilarity::Similarity similarity)
 {
+	validateFolderPath(imageFolderPath);
+
 	std::vector<std::string> filenames{ getJpegInFolder(imageFolderPath) };
 
 	auto folders = getAllFoldersInFolder(imageFolderPath);
@@ -98,14 +101,9 @@ OptimizationResult ImageOptimizer::parallelOptimizeImages(const std::vector<std:
 
 	size_t first = imagesPerThread * nthreads;
 
-	futures.push_back(std::async(std::launch::async, [=]() {return optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity); }));
+	OptimizationResult result = optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity);
 
-	OptimizationResult result;
-
-	for (auto& future : futures)
-	{
-		result += future.get();
-	}
+	std::accumulate(futures.begin(), futures.end(), result, [](auto& total, auto& future) {return total + future.get(); });
 
 	return result;
 }

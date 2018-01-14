@@ -5,8 +5,6 @@
 #include <vector>
 #include <string>
 
-
-
 namespace cv
 {
 	class Mat;

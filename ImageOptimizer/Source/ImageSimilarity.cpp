@@ -81,16 +81,16 @@ namespace ImageSimilarity
 			}
 		}
 			
- 		dst[0] = boxes[(SQUARE_LEN - 1) * width + SQUARE_LEN - 1];
+ 		dst[0] = static_cast<float>(boxes[(SQUARE_LEN - 1) * width + SQUARE_LEN - 1]);
 
 		for (unsigned int x = 1; x < dst_w; x++)
 		{
-			dst[x] = (boxes[(SQUARE_LEN - 1) * width + x + SQUARE_LEN - 1] - boxes[(SQUARE_LEN - 1) * width + x - 1]);
+			dst[x] = static_cast<float>(boxes[(SQUARE_LEN - 1) * width + x + SQUARE_LEN - 1] - boxes[(SQUARE_LEN - 1) * width + x - 1]);
 		}
 
 		for (unsigned int y = 1; y < dst_h; ++y)
 		{
-			dst[y * dst_w] = (boxes[(y + SQUARE_LEN - 1) * width + SQUARE_LEN - 1] - boxes[(y - 1) * width + SQUARE_LEN - 1]);
+			dst[y * dst_w] = static_cast<float>(boxes[(y + SQUARE_LEN - 1) * width + SQUARE_LEN - 1] - boxes[(y - 1) * width + SQUARE_LEN - 1]);
 
 			for (unsigned int x = 1; x < dst_w; ++x)
 			{
