@@ -111,13 +111,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\ImageOptimizer.h" />
-    <ClInclude Include="Include\ImageProcessor.h" />
     <ClInclude Include="Include\ImageSimilarity.h" />
     <ClInclude Include="Include\Logger.h" />
     <ClInclude Include="Include\OptimizationResult.h" />
-    <ClInclude Include="Include\Quality.h" />
+    <ClInclude Include="Source\ImageProcessor.h" />
     <ClInclude Include="Source\JpegEncoderDecoder.h" />
     <ClInclude Include="Source\OptimizationSequence.h" />
+    <ClInclude Include="Source\Quality.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

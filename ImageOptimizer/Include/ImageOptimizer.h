@@ -2,7 +2,6 @@
 #define ImageProcessorImplementation_h__
 
 #include "Logger.h"
-#include "ImageProcessor.h"
 #include "ImageSimilarity.h"
 #include "OptimizationResult.h"
 
@@ -14,12 +13,13 @@ namespace cv
 	class Mat;
 }
 
-class OptimizationSequence;
+class ImageProcessor;
 
 class  ImageOptimizer
 {
 public:
 	ImageOptimizer();
+	~ImageOptimizer();
 
 	void SetLogCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback);
 
@@ -55,7 +55,7 @@ private:
 
 	Logger m_logger;
 
-	ImageProcessor m_imageProcessor;
+	std::unique_ptr<ImageProcessor> m_imageProcessor;
 };
 
 #endif // ImageProcessorImplementation_h__

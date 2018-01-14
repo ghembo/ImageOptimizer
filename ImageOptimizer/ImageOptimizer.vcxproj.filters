@@ -47,9 +47,6 @@
     <ClInclude Include="Include\OptimizationResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\ImageProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\ImageSimilarity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -59,7 +56,10 @@
     <ClInclude Include="Include\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Quality.h">
+    <ClInclude Include="Source\Quality.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImageProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

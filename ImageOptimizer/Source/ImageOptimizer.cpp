@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "JpegEncoderDecoder.h"
 #include "OptimizationResult.h"
+#include "ImageProcessor.h"
 
 #include "opencv2\core\core.hpp"
 
@@ -23,9 +24,11 @@ std::string ImageOptimizer::GetVersion()
 }
 
 ImageOptimizer::ImageOptimizer() :
-	m_imageProcessor(m_logger)
+	m_imageProcessor(new ImageProcessor(m_logger))
 {
 }
+
+ImageOptimizer::~ImageOptimizer() = default;
 
 void ImageOptimizer::SetLogCallbacks(traceCallback_t traceCallback, warningCallback_t warningCallback, errorCallback_t errorCallback)
 {
@@ -117,7 +120,7 @@ OptimizationResult ImageOptimizer::OptimizeImage( const std::string& imagePath, 
 
 	m_logger.trace("Target ssim: " + std::to_string(similarity.GetValue()));
 	
-	auto bestQuality = m_imageProcessor.OptimizeImage(image, similarity);
+	auto bestQuality = m_imageProcessor->OptimizeImage(image, similarity);
 
 	image.release();
 
