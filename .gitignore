@@ -33,6 +33,7 @@
 *.opensdf
 *.opendb
 *.db
+*.user
 
 # Dirs
 **/.metadata/
@@ -46,4 +47,5 @@
 **/Reports/
 **/Unused/
 **/Packages/
-**/TestImages/
+**/images/
+**/build/
