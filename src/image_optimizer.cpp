@@ -224,7 +224,7 @@ std::string ImageOptimizer::addSuffixToFileName(const std::string& filename, con
 {
 	fs::path p(filename);
 
-	fs::path newFilename = p.parent_path() / fs::path(p.stem().string() + suffix + p.extension().string());
+	fs::path newFilename = fs::path(R"(C:\Proj\compressed)") / fs::path(p.stem().string() + suffix + p.extension().string());
 
 	return newFilename.string();
 }
