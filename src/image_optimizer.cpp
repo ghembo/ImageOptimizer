@@ -82,12 +82,12 @@ OptimizationResult ImageOptimizer::optimizeImages(const iterator_t& first, const
 
 OptimizationResult ImageOptimizer::parallelOptimizeImages(const std::vector<std::string>& filenames, ImageSimilarity::Similarity similarity)
 {
-	const auto nthreads = std::thread::hardware_concurrency();
+	const auto nthreads = 1;// std::thread::hardware_concurrency();
 	const auto nfiles = filenames.size();
 	const auto imagesPerThread = nfiles / nthreads;
 
 	std::vector<std::future<OptimizationResult>> futures;
-
+/*
 	for (size_t t = 0; t < nthreads; t++)
 	{
 		size_t firstImage = imagesPerThread * t;
@@ -96,8 +96,8 @@ OptimizationResult ImageOptimizer::parallelOptimizeImages(const std::vector<std:
 		futures.push_back(std::async(std::launch::async, [=]() {return optimizeImages(filenames.cbegin() + firstImage, filenames.cbegin() + lastImage, similarity); }));
 	}
 
-	size_t first = imagesPerThread * nthreads;
-
+	size_t first = imagesPerThread * nthreads;*/
+	size_t first = 0;
 	OptimizationResult result = optimizeImages(filenames.cbegin() + first, filenames.cend(), similarity);
 
 	return std::accumulate(futures.begin(), futures.end(), result, [](auto& total, auto& future) {return total + future.get(); });
