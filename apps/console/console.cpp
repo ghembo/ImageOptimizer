@@ -1,7 +1,7 @@
 #include "iopt/image_optimizer.hpp"
 #include "iopt/optimization_result.hpp"
 
-#include "Options.hpp"
+#include "options.hpp"
 
 #include <iostream>
 #include <chrono>
@@ -61,7 +61,7 @@ OptimizationResult processImageOrFolder(const std::string& input, float targetSi
 	}
 	else
 	{
-		throw std::exception("Input isn't a regular file or directory");
+		throw std::invalid_argument("Input isn't a regular file or directory");
 	}
 }
 

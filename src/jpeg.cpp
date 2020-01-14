@@ -6,9 +6,6 @@
 #include <chrono>
 
 
-FILE _iob[] = { *stdin, *stdout, *stderr };
-extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
-
 TJSAMP chromaSampling(TJPF colorspace) {
 	return colorspace == TJPF_GRAY ? TJSAMP_GRAY : TJSAMP_420;
 }
@@ -29,7 +26,7 @@ namespace jpeg {
 		if (res != 0) {
 			tjFree(compressedImage);
 
-			throw std::exception(tjGetErrorStr());
+			throw std::runtime_error(tjGetErrorStr());
 		}
 
 		std::vector<uint8_t> compressed(compressedImage, compressedImage + size);

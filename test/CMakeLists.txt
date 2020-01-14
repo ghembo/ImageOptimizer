@@ -22,8 +22,10 @@ target_link_libraries(iOptTest PRIVATE iOpt Catch2::Catch2)
 # You can also run examples and check the output, as well.
 add_test(NAME iOptTest COMMAND iOptTest) # Command can be a target
 
-if( ${CMAKE_BUILD_TYPE} MATCHES  "Debug" )
-	set_target_properties(iOptTest PROPERTIES LINK_FLAGS /NODEFAULTLIB:LIBCMTD.LIB)
-else()
-	set_target_properties(iOptTest PROPERTIES LINK_FLAGS /NODEFAULTLIB:LIBCMT.LIB)
+if(MSVC)
+	if( ${CMAKE_BUILD_TYPE} MATCHES  "Debug" )
+		set_target_properties(iOptTest PROPERTIES LINK_FLAGS /NODEFAULTLIB:LIBCMTD.LIB)
+	else()
+		set_target_properties(iOptTest PROPERTIES LINK_FLAGS /NODEFAULTLIB:LIBCMT.LIB)
+	endif()
 endif()

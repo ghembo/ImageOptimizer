@@ -24,4 +24,6 @@ set_target_properties(iOpt PROPERTIES CXX_EXTENSIONS OFF)
 # IDEs should put the headers in a nice place
 source_group("Header Files\\api" FILES ${API_HEADER_LIST})
 
-target_link_libraries(iOpt PRIVATE jpeg_turbo)
+find_package(Threads REQUIRED)
+
+target_link_libraries(iOpt PRIVATE jpeg_turbo Threads::Threads)

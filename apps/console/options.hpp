@@ -24,16 +24,9 @@ public:
 
 		options.parse_positional("input");
 
-		try
-		{
-			options.parse(argc, argv);
+		options.parse(argc, argv);
 
-			option.m_helpMessage = options.help();
-		}
-		catch (const cxxopts::OptionException& e)
-		{
-			throw std::exception(e.what());
-		}
+		option.m_helpMessage = options.help();
 
 		return option;
 	}
