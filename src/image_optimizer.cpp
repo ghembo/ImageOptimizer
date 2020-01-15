@@ -109,15 +109,15 @@ inline uint8_t fastRound(float value) {
 }
 
 auto colorToGray(const Image& colorImage) {
+	const auto grayImageSize{ colorImage.width * colorImage.height };
 	Image grayImage;
 	grayImage.width = colorImage.width;
 	grayImage.height = colorImage.height;
-	grayImage.data = std::vector<uint8_t>(grayImage.width * grayImage.height);
+	grayImage.buffer = std::make_unique<unsigned char[]>(grayImageSize);
 
-	const auto size = grayImage.data.size();
-	const uint8_t* pColor = colorImage.data.data();
-	uint8_t* pGray = grayImage.data.data();
-	for (size_t i = 0; i < size; i++) {
+	const uint8_t* pColor = colorImage.buffer.get();
+	uint8_t* pGray = grayImage.buffer.get();
+	for (size_t i = 0; i < grayImageSize; i++) {
 		auto r = pColor[i * 3 + 0];
 		auto g = pColor[i * 3 + 1];
 		auto b = pColor[i * 3 + 2];
@@ -208,8 +208,7 @@ void ImageOptimizer::validateImagePath(const std::string& imagePath)
 
 void ImageOptimizer::validateImage(const Image& image)
 {
-	if (image.data.data() == NULL)
-	{
+	if (!image.buffer) {
 		handleInvalidArgument("Image format not supported");
 	}
 }

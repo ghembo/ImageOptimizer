@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
+#include <memory>
 
 struct Image {
 	int width;
 	int height;
-	std::vector<unsigned char> data;
+	std::unique_ptr<unsigned char[]> buffer;
 };

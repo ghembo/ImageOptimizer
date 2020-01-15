@@ -57,7 +57,7 @@ ImageSimilarity::Similarity ImageProcessor::computeSsim(const Image& image, Qual
 {
 	auto compressedImage = jpeg::memory_encode_decode_grayscale(image, quality);
 
-	assert(compressedImage.data.size());
+	assert(compressedImage.buffer);
 
 	return ImageSimilarity::ComputeSsim(image, compressedImage);
 }

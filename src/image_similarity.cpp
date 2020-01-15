@@ -244,15 +244,15 @@ namespace ImageSimilarity
 		if (scale > 1)
 		{
 			Size newSize;
-			std::tie(referenceFloat, newSize) = decimate(referenceImage.data.data(), size, scale);
-			std::tie(compareFloat, newSize) = decimate(compareImage.data.data(), size, scale);
+			std::tie(referenceFloat, newSize) = decimate(referenceImage.buffer.get(), size, scale);
+			std::tie(compareFloat, newSize) = decimate(compareImage.buffer.get(), size, scale);
 			
 			size = newSize;
 		}
 		else
 		{
-			referenceFloat = convertToFloat(referenceImage.data.data(), size);
-			compareFloat = convertToFloat(compareImage.data.data(), size);
+			referenceFloat = convertToFloat(referenceImage.buffer.get(), size);
+			compareFloat = convertToFloat(compareImage.buffer.get(), size);
 		}
 		
 		return{ ssim(referenceFloat.get(), compareFloat.get(), size) };
