@@ -13,4 +13,5 @@ namespace jpeg {
 
 	std::vector<uint8_t> memory_encode_grayscale(const Image & image, unsigned int quality);
 	Image memory_decode_grayscale(const std::vector<uint8_t>& buffer);
+	Image memory_encode_decode_grayscale(const Image& image, unsigned int quality);
 };

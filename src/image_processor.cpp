@@ -55,9 +55,7 @@ OptimizationSequence ImageProcessor::searchBestQuality(const Image& image, sim::
 
 ImageSimilarity::Similarity ImageProcessor::computeSsim(const Image& image, Quality quality)
 {
-	std::vector<uint8_t> buffer = jpeg::memory_encode_grayscale(image, quality);
-
-	auto compressedImage = jpeg::memory_decode_grayscale(buffer);
+	auto compressedImage = jpeg::memory_encode_decode_grayscale(image, quality);
 
 	assert(compressedImage.data.size());
 

@@ -65,6 +65,47 @@ namespace jpeg {
 		return memory_decode(buffer, TJPF_GRAY);
 	}
 
+	Image memory_encode_decode_grayscale(const Image& image, unsigned int quality) {
+		//return memory_decode_grayscale(memory_encode_grayscale(image, quality));
+
+		auto imageData{ image.data.data() };
+
+		tjhandle _jpegCompressor = tjInitCompress();
+
+		unsigned char* compressedImage = nullptr;
+		unsigned long size;
+
+		auto res = tjCompress2(_jpegCompressor, imageData, image.width, 0, image.height, TJPF_GRAY,
+			&compressedImage, &size, chromaSampling(TJPF_GRAY), quality, TJFLAG_ACCURATEDCT);
+
+		tjDestroy(_jpegCompressor);
+
+		if (res != 0) {
+			tjFree(compressedImage);
+
+			throw std::runtime_error(tjGetErrorStr());
+		}
+
+		int jpegSubsamp;
+
+		tjhandle _jpegDecompressor = tjInitDecompress();
+		Image outImage;
+
+		tjDecompressHeader2(_jpegDecompressor, compressedImage, size, &outImage.width, &outImage.height, &jpegSubsamp);
+
+		auto channels{ tjPixelSize[TJPF_GRAY] };
+
+		outImage.data = std::vector<unsigned char>(outImage.width * outImage.height * channels);
+
+		tjDecompress2(_jpegDecompressor, compressedImage, size, outImage.data.data(), outImage.width, 0/*pitch*/, outImage.height, TJPF_GRAY, TJFLAG_ACCURATEDCT);
+
+		tjFree(compressedImage);
+		tjDestroy(_jpegDecompressor);
+
+		return outImage;
+	}
+
+
 	void save(const Image& image, const std::string& filename, unsigned int quality) {
 		auto compressedImage = memory_encode(image, TJPF_RGB, quality);
 
