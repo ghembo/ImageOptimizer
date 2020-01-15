@@ -12,13 +12,15 @@ TJSAMP chromaSampling(TJPF colorspace) {
 
 namespace jpeg {
 
-	std::vector<uint8_t> encodeImageTurbo(const unsigned char* image, int width, int height, TJPF colorspace, unsigned int quality) {
+	std::vector<uint8_t> memory_encode(const Image& image, TJPF colorspace, unsigned int quality) {
+		auto imageData{ image.data.data() };
+
 		tjhandle _jpegCompressor = tjInitCompress();
 
 		unsigned char* compressedImage = nullptr;
 		unsigned long size;
 
-		auto res = tjCompress2(_jpegCompressor, image, width, 0, height, colorspace,
+		auto res = tjCompress2(_jpegCompressor, imageData, image.width, 0, image.height, colorspace,
 			&compressedImage, &size, chromaSampling(colorspace), quality, TJFLAG_ACCURATEDCT);
 
 		tjDestroy(_jpegCompressor);
@@ -36,47 +38,42 @@ namespace jpeg {
 		return compressed;
 	}
 
-	std::vector<unsigned char> decodeImageTurbo(const uint8_t* buffer, int size, int* width, int* height, TJPF colorspace) {
+	Image memory_decode(const std::vector<uint8_t>& buffer, TJPF colorspace) {
 		int jpegSubsamp;
 
 		tjhandle _jpegDecompressor = tjInitDecompress();
+		Image image;
 
-		tjDecompressHeader2(_jpegDecompressor, const_cast<uint8_t*>(buffer), size, width, height, &jpegSubsamp);
+		tjDecompressHeader2(_jpegDecompressor, const_cast<uint8_t*>(buffer.data()), buffer.size(), &image.width, &image.height, &jpegSubsamp);
 
 		auto channels{ tjPixelSize[colorspace] };
 
-		std::vector<unsigned char> uncompressedBuffer(*width**height * channels);
+		image.data = std::vector<unsigned char>(image.width * image.height * channels);
 
-		tjDecompress2(_jpegDecompressor, buffer, size, uncompressedBuffer.data(), *width, 0/*pitch*/, *height, colorspace, TJFLAG_ACCURATEDCT);
+		tjDecompress2(_jpegDecompressor, buffer.data(), buffer.size(), image.data.data(), image.width, 0/*pitch*/, image.height, colorspace, TJFLAG_ACCURATEDCT);
 
 		tjDestroy(_jpegDecompressor);
-
-		return uncompressedBuffer;
-	}
-
-	std::vector<uint8_t> memory_encode(const Image& image, unsigned int quality) {
-		return encodeImageTurbo(image.data.data(), image.width, image.height, TJPF_GRAY, quality);
-	}
-
-	Image memory_decode_grayscale(const std::vector<uint8_t>& buffer)
-	{
-		Image image;
-
-		image.data = decodeImageTurbo(buffer.data(), buffer.size(), &image.width, &image.height, TJPF_GRAY);
 
 		return image;
 	}
 
-	void save(const Image& image, const std::string& filename, unsigned int quality)
-	{
-		auto compressedImage = encodeImageTurbo(image.data.data(), image.width, image.height, TJPF_RGB, quality);
+	std::vector<uint8_t> memory_encode_grayscale(const Image& image, unsigned int quality) {
+		return memory_encode(image, TJPF_GRAY, quality);
+	}
+
+	Image memory_decode_grayscale(const std::vector<uint8_t>& buffer) {
+		return memory_decode(buffer, TJPF_GRAY);
+	}
+
+	void save(const Image& image, const std::string& filename, unsigned int quality) {
+		auto compressedImage = memory_encode(image, TJPF_RGB, quality);
 
 		std::ofstream imOut(filename, std::ios::binary);
 
 		imOut.write(reinterpret_cast<char*>(compressedImage.data()), compressedImage.size());
 	}
 
-	std::vector<unsigned char> loadImageTurbo(const std::string& imagePath, int* width, int* height, TJPF colorspace) {
+	Image load(const std::string& imagePath, TJPF colorspace) {
 		std::ifstream file(imagePath, std::ios::binary | std::ios::ate);
 		std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
@@ -87,23 +84,14 @@ namespace jpeg {
 			/* worked! */
 		}
 
-		return decodeImageTurbo(buffer.data(), buffer.size(), width, height, colorspace);
+		return memory_decode(buffer, colorspace);
 	}
 
 	Image load_color(const std::string& imagePath) {
-		Image image;
-
-		image.data = loadImageTurbo(imagePath, &image.width, &image.height, TJPF_RGB);
-
-		return image;
+		return load(imagePath, TJPF_RGB);
 	}
 
-	Image load_grayscale(const std::string& imagePath)
-	{
-		Image image;
-
-		image.data = loadImageTurbo(imagePath, &image.width, &image.height, TJPF_GRAY);
-
-		return image;
+	Image load_grayscale(const std::string& imagePath) {
+		return load(imagePath, TJPF_GRAY);
 	}
 }
