@@ -5,6 +5,7 @@
 #include "iopt/optimization_result.hpp"
 
 #include <string>
+#include <vector>
 #include <filesystem>
 
 class ImageProcessor;

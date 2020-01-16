@@ -5,10 +5,8 @@
 #include "iopt/optimization_result.hpp"
 #include "image_processor.hpp"
 
-#include <string>
 #include <regex>
 #include <future>
-#include <filesystem>
 #include <numeric>
 
 namespace fs = std::filesystem;
